@@ -4,7 +4,7 @@
 
 entrypoints        Program ;
 
-MainProgram.       Program ::= [TopDef] ;
+PProgram.          Program ::= [TopDef] ;
 
 FnDef.	           TopDef ::= Type Ident "(" [Arg] ")" Block ;
 
@@ -18,19 +18,21 @@ RefArg.            ArgType ::= Type "&" ;
 
 separator          ArgType "," ;
 
-Arg. 	           Arg ::= ArgType Ident;
+AArg. 	           Arg ::= ArgType Ident;
 
 separator          Arg "," ;
 
 -- Statements and declarations ----------------------------
 
-Block.             Block ::= "{" [Stmt] "}" ;
+BBlock.            Block ::= "{" [Stmt] "}" ;
 
 separator          Stmt "" ;
 
 BStmt.             Stmt ::= Block ;
 
-Decl.              Stmt ::= Type [Item] ";" ;
+DStmt.             Stmt ::= Decl ;
+
+DDecl.             Decl ::= Type [Item] ";" ;
 
 NoInit.            Item ::= Ident ;
 
