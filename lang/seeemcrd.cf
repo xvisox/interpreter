@@ -68,7 +68,7 @@ Bool.      Type ::= "bool" ;
 
 Void.      Type ::= "void" ;
 
-Fun.       Type ::= "(" [ArgType] ")" "->" Type ;
+Fun.       Type ::= Type "(" [ArgType] ")" ;
 
 separator  Type "," ;
 
