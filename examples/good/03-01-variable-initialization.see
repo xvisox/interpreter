@@ -1,0 +1,12 @@
+void main() {
+    int a = 42, b = 10, c;
+    bool x, y, z = false;
+    string j, k = "Hello", l;
+    l = "Override";
+
+    int(int) identity = int lambda(int x) => {
+        return x;
+    };
+
+    return;
+}

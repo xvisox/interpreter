@@ -1,0 +1,10 @@
+void main() {
+    int a = 23;
+    int b = 19;
+    int c = a + b; // c = 42
+    int d = a - b; // z = 4
+    z = a * b;     // z = 437
+    z = a / b;     // z = 1
+
+    return;
+}

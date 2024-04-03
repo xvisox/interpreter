@@ -1,0 +1,7 @@
+void main() {
+    string s = "Hello ";
+    string z = "Mum", x = "Not used";
+    x = s + z; // x = "Hello Mum"
+
+    return;
+}

@@ -1,0 +1,7 @@
+void main() {
+    int n = 10;
+    string s = "Hello World";
+    bool b = true;
+
+    return;
+}

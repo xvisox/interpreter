@@ -1,0 +1,19 @@
+void main() {
+    int a = 40;
+    int b = 20;
+
+    bool res = true;
+    res = a < b;  // res = false
+    res = a > b;  // res = true
+    res = a <= b; // res = false
+    res = a >= b; // res = true
+    res = a == b; // res = false
+    res = a != b; // res = true
+    
+    bool b1 = true;
+    bool b2 = false;
+    bool b3 = b1 && b2;  // b3 = false
+    b3 = b1 || b2;       // b3 = true
+
+    return;
+}
