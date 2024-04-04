@@ -1,6 +1,6 @@
 void main() {
-    int a = 40;
-    int b = 20;
+    int a = 21;
+    int b = 15;
 
     bool res = true;
     res = a < b;  // res = false

@@ -1,0 +1,13 @@
+void main() {
+    if (true) {
+        printBool(true);
+    }
+
+    if (false) {
+        // whoops
+    } else {
+        printStr("else branch");
+    }
+
+    return;
+}
