@@ -1,0 +1,21 @@
+int apply(int(int) fun, int val) {
+    return fun(val);
+}
+
+void main() {
+    int fun(int val) {
+        return val + 21;
+    }
+
+    int(int) funVar = fun;
+    printInt(funVar(0)); // 21
+
+    funVar = int lambda(int x) => {
+        return x;
+    };
+    printInt(funVar(15)); // 15
+
+    printInt(apply(funVar, 2115)); // 2115
+
+    return;
+}
