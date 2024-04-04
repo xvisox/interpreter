@@ -1,0 +1,11 @@
+int g = 2100;
+
+int calc() {
+    return g + 15;
+}
+
+void main() {
+    printInt(calc());
+
+    return;
+}
