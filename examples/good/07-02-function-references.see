@@ -1,0 +1,21 @@
+void hello() {
+    printStr("Hello, World!");
+}
+
+void goodbye() {
+    printStr("Goodbye, World!");
+}
+
+void callFunction(void() &func) {
+    func(); // Hello, World!
+
+    func = goodbye;
+}
+
+void main() {
+    void() func = hello;
+    callFunction(func);
+    func(); // Goodbye, World!
+
+    return;
+}

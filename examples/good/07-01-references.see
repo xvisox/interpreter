@@ -1,18 +1,15 @@
 void inc(int &x) {
     x++;
-    return;
 }
 
 void notInc(int x) {
     x++;
-    return;
 }
 
 void swap(int &x, int &y) {
     int z = x;
     x = y;
     y = z;
-    return;
 }
 
 void main() {
