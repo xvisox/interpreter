@@ -1,0 +1,11 @@
+void main() {
+    int a = 21;
+    int b = 15;
+
+    int c = a + b; // c = 36
+    int d = a - b; // d = 6
+    d = a * b;     // d = 315
+    d = a / b;     // d = 1
+
+    return;
+}

@@ -1,0 +1,11 @@
+int fun() {
+    int funnier() {
+        return 2115;
+    }
+    return funnier();
+}
+
+void main() {
+    printInt(fun()); // 2115
+    return;
+}

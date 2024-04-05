@@ -1,0 +1,18 @@
+int g = 12345;
+
+int calc(string g) {
+    return toInt(g) + 15;
+}
+
+void main() {
+    printInt(calc("2100")); // 2115
+
+    int x = 21;
+    int nested() {
+        return x;
+    }
+
+    printInt(nested()); // 21
+
+    return;
+}

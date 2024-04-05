@@ -1,0 +1,33 @@
+void inc(int &x) {
+    x++;
+    return;
+}
+
+void notInc(int x) {
+    x++;
+    return;
+}
+
+void swap(int &x, int &y) {
+    int z = x;
+    x = y;
+    y = z;
+    return;
+}
+
+void main() {
+    int x = 20;
+    inc(x);
+    printInt(x); // 21
+
+    int y = 15;
+    notInc(y);
+    printInt(y); // 15
+
+    int a = 15, b = 21;
+    swap(a, b);
+    printInt(a); // 21
+    printInt(b); // 15
+
+    return;
+}
