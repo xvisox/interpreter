@@ -1,0 +1,9 @@
+void fun(int &x) {
+    x++;
+}
+
+void main() {
+    fun(2115);
+
+    return;
+}

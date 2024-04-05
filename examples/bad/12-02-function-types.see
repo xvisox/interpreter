@@ -1,0 +1,17 @@
+void learnRef(void(int&) fun, int &val) {
+    fun(val);
+}
+
+string simple(int x) {
+    return toStr(x);
+}
+
+void main() {
+    int x = 21;
+    // should throw because lambda has different type than declared in function (because of the reference)
+    learnRef(void lambda(int val) => { val = val + 100; }, x);
+
+    simple("21");
+
+    return;
+}

@@ -5,8 +5,13 @@ int fibo(int n) {
     return fibo(n - 2) + fibo(n - 1);
 }
 
+void hi() {
+    printStr("Hi without return");
+}
+
 void main() {
     printInt(fibo(5)); // 5
+    hi();
 
     return;
 }

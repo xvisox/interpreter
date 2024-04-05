@@ -1,0 +1,6 @@
+int x = y;
+int y = 15;
+
+void main() {
+    return;
+}

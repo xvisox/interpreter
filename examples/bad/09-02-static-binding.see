@@ -1,0 +1,10 @@
+void main() {
+    void() fun = void lambda() => {
+        int x = 2115;
+        printInt(x);
+    };
+
+    printInt(x); // from where?
+
+    return;
+}

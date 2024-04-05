@@ -1,0 +1,6 @@
+void main() {
+    int c;
+    int x, c = 5;
+
+    return;
+}

@@ -1,0 +1,5 @@
+void main() {
+    printStr('Not a string');
+
+    return;
+}

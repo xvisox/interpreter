@@ -1,0 +1,10 @@
+int funny() {
+    printStr("Hi");
+    // return 0;
+}
+
+void main() {
+    funny();
+
+    return;
+}

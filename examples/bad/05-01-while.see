@@ -1,0 +1,7 @@
+void main() {
+    while (t--) { // valid c++ code...
+        printInt(t);
+    }
+
+    return;
+}

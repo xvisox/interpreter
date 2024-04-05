@@ -2,6 +2,10 @@ int apply(int(int) fun, int val) {
     return fun(val);
 }
 
+void learnRef(void(int&) fun, int &val) { // <- reference to val, important in this case
+    fun(val);
+}
+
 void main() {
     int fun(int val) {
         return val + 21;
@@ -16,6 +20,10 @@ void main() {
     printInt(funVar(15)); // 15
 
     printInt(apply(funVar, 2115)); // 2115
+
+    int x = 21;
+    learnRef(void lambda(int &val) => { val = val + 100; }, x);
+    printInt(x); // 121
 
     return;
 }

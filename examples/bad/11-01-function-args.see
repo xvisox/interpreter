@@ -1,0 +1,9 @@
+string fun(int a, int b, int c) {
+    return toStr(a) + toStr(b);
+}
+
+void main() {
+    fun(21, 15);
+
+    return;
+}

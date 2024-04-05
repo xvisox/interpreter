@@ -1,0 +1,13 @@
+int abc(int x) {
+    int abc() {
+        return 1;
+    }
+    return x;
+}
+
+int a = 1;
+string a = "sth";
+
+void main() {
+    return;
+}

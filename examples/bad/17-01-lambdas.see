@@ -1,0 +1,8 @@
+
+void main() {
+    void() fun = void lambda(int x) => {
+        return 21;
+    };
+
+    return;
+}

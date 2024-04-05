@@ -1,0 +1,6 @@
+void main() {
+    int x = 21 + toStr(15);
+    string = "Hi, " + toInt("15") + true;
+
+    return;
+}

@@ -1,0 +1,6 @@
+void main() {
+    printInt(1 / 0);
+    printInt(21++15);
+
+    return;
+}

@@ -1,0 +1,8 @@
+void main() {
+    int x = "some string";
+    int y = int lambda() => { return 21; };
+
+    int a = 15, b = "21";
+
+    return;
+}

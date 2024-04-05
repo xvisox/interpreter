@@ -1,0 +1,9 @@
+void main() {
+    int x = 1;
+    bool y = true;
+    if (x == y) {
+        printStr("Not a valid comparison");
+    }
+
+    return;
+}
