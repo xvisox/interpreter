@@ -61,3 +61,4 @@ pomocnicze takie jak `toStr(int), toInt(str)` czy `exit(int)`.
   
   Razem: 30
 ```
+Autor: Hubert Michalski
