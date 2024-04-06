@@ -2,7 +2,7 @@
 
 ### Tekstowy opis języka
 
-*seeemcrd* to statycznie typowany język imperatywny, którego pliki wykonywalne mają rozszerzenie `see`.
+*seeemcrd* to statycznie typowany język imperatywny, którego pliki źródłowe mają rozszerzenie `see`.
 Składnia języka bazuje na składni *Latte* - nie posiada specjalnych udziwnień,
 jeśli chodzi o standardowe operacje, definicje czy wrażenia. Do języka została dodana
 możliwość przekazywania zmiennych przez referencje do funkcji (poza standardowym przekazywaniem przez wartość).
