@@ -31,17 +31,29 @@ data Env = Env {
   returnType :: TCType
 }
 
-data TypingException
+data TypeCheckException
   = AssignmentMismatch
   | Redeclared Ident
 
-instance Show TypingException where
+instance Show TypeCheckException where
   show AssignmentMismatch = "Assignment mismatch"
   show (Redeclared ident) = "Redeclared variable: " ++ show ident
 
-type TCM = ReaderT Env (Except TypingException)
+type TCM = ReaderT Env (Except TypeCheckException)
 
 -- Typechecking entrypoint
 
-typeCheck :: Program -> Either TypingException ()
-typeCheck _ = Right ()
+typeCheck :: Program -> Either TypeCheckException ()
+typeCheck (PProgram _ topDefs) = runExcept $ runReaderT (typeCheckTopDefs topDefs) (Env empty False TCVoid)
+
+-- Typechecking functions
+
+typeCheckTopDefs :: [TopDef] -> TCM ()
+typeCheckTopDefs [] = return ()
+typeCheckTopDefs (topDef:topDefs) = do
+  typeCheckTopDef topDef
+  typeCheckTopDefs topDefs
+
+typeCheckTopDef :: TopDef -> TCM ()
+typeCheckTopDef (GlobalDef _ _ items) = do -- TODO: Implement
+  return ()
