@@ -1,7 +1,7 @@
 import System.IO
 import System.Environment
 import ParSeeemcrd (myLexer, pProgram)
-import TypeCheck (typeCheck)
+import Typing.TypeCheck (typeCheck)
 
 main :: IO()
 main = do
