@@ -43,6 +43,12 @@ typeCheckTopDefs (topDef:topDefs) = do
 typeCheckTopDef :: TopDef -> TCM Env
 typeCheckTopDef (GlobalDef _ varType items) = do
   typeCheckItems (mapToTCType varType) items
+typeCheckTopDef (FnDef pos returnType ident args block) = do
+  env <- declareIdentOrThrow pos ident (TCFun (mapToTCArgTypes args) (mapToTCType returnType))
+  let typesWithIdents = mapToTypesWithIdents args
+  let argEnv = Prelude.foldl (\acc (varType, ident) -> insertVar ident varType acc) env typesWithIdents
+  local (const argEnv) $ typeCheckBlock block
+  return env
 
 typeCheckItems :: TCType -> [Item] -> TCM Env
 typeCheckItems varType [] = ask
@@ -88,3 +94,19 @@ typeCheckExpr (EApp pos ident exprs) = do
           return returnType
     Just _ -> throwTypeCheckError pos $ NotAFunction ident
     Nothing -> throwTypeCheckError pos $ NoVariable ident
+
+typeCheckBlock :: Block -> TCM Env
+typeCheckBlock (BBlock _ stmts) = do
+  env <- ask
+  local (const $ newScope env) $ typeCheckStmts stmts
+
+typeCheckStmts :: [Stmt] -> TCM Env
+typeCheckStmts [] = ask
+typeCheckStmts (stmt:stmts) = do
+  env <- typeCheckStmt stmt
+  local (const env) $ typeCheckStmts stmts
+
+typeCheckStmt :: Stmt -> TCM Env
+typeCheckStmt (BStmt _ block) = typeCheckBlock block
+typeCheckStmt (DStmt _ topDef) = typeCheckTopDef topDef
+typeCheckStmt _ = ask -- TODO;

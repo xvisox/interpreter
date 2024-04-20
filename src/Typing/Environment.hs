@@ -27,3 +27,6 @@ lookupVar ident env = Data.Map.lookup ident (variables env)
 
 insertVar :: Ident -> TCType -> Env -> Env
 insertVar ident varType env = env { variables = Data.Map.insert ident (varType, scope env) (variables env) }
+
+newScope :: Env -> Env
+newScope env = env { scope = scope env + 1 }

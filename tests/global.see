@@ -1,1 +1,14 @@
-string x = "str", x;
+int x;
+
+int dupa(int &x, int y) {
+    int z = y;
+    return x;
+}
+
+int ee() {
+    int x = 3;
+    int z = dupa(x, 3);
+}
+
+int y = 3;
+int x = dupa(y, 3);

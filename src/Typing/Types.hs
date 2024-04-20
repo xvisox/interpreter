@@ -28,7 +28,13 @@ instance Show TCType where
   show TCVoid = "void"
 
 data TCArgType = TCArgType TCArgKind TCType
-  deriving (Eq, Read, Show)
+  deriving (Eq, Read)
+
+instance Show TCArgType where
+  show (TCArgType argKind argType) = show argKind ++ show argType
+
+extractType :: TCArgType -> TCType
+extractType (TCArgType _ argType) = argType
 
 mapToTCType :: Type -> TCType
 mapToTCType (Int _) = TCInt
@@ -40,3 +46,9 @@ mapToTCType (Fun _ returnType args) = TCFun (Prelude.map mapToTCArgType args) (m
 mapToTCArgType :: ArgType -> TCArgType
 mapToTCArgType (ValArg _ argType) = TCArgType TCVal (mapToTCType argType)
 mapToTCArgType (RefArg _ argType) = TCArgType TCRef (mapToTCType argType)
+
+mapToTCArgTypes :: [Arg] -> [TCArgType]
+mapToTCArgTypes = Prelude.map (\(AArg _ argType _) -> mapToTCArgType argType)
+
+mapToTypesWithIdents :: [Arg] -> [(TCType, Ident)]
+mapToTypesWithIdents = Prelude.map (\(AArg _ argType ident) -> (extractType $ mapToTCArgType argType, ident))
