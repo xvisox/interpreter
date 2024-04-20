@@ -1,1 +1,1 @@
-string x = 4;
+string x = "str", x;
