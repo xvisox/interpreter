@@ -25,7 +25,7 @@ declareIdentOrThrow pos ident varType = do
   case lookupVar ident env of
     Just (_, varScope) -> if varScope == currentScope
                             then throwTypeCheckError pos $ Redeclared ident
-                            else return env -- Shadowing allowed, so the identifier is not redeclared
+                            else return $ insertVar ident varType env
     Nothing -> return $ insertVar ident varType env
 
 validateIdentOrThrow :: Pos -> Ident -> TCType -> TCM Env
