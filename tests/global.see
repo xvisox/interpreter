@@ -1,14 +1,17 @@
 int x;
 
+
+
 int dupa(int &x, int y) {
     int z = y;
     return x;
 }
 
 int ee() {
-    int x = 3;
+    int x, x;
     int z = dupa(x, 3);
+
+    return z;
 }
 
 int y = 3;
-int x = dupa(y, 3);
