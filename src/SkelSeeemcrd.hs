@@ -50,9 +50,9 @@ transStmt x = case x of
   AbsSeeemcrd.Decr _ ident -> failure x
   AbsSeeemcrd.Ret _ expr -> failure x
   AbsSeeemcrd.VRet _ -> failure x
-  AbsSeeemcrd.Cond _ expr stmt -> failure x
-  AbsSeeemcrd.CondElse _ expr stmt1 stmt2 -> failure x
-  AbsSeeemcrd.While _ expr stmt -> failure x
+  AbsSeeemcrd.Cond _ expr block -> failure x
+  AbsSeeemcrd.CondElse _ expr block1 block2 -> failure x
+  AbsSeeemcrd.While _ expr block -> failure x
   AbsSeeemcrd.SExp _ expr -> failure x
 
 transItem :: Show a => AbsSeeemcrd.Item' a -> Result

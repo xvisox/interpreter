@@ -5,7 +5,7 @@ import AbsSeeemcrd(Ident)
 
 import Typing.Types
 
-type Scope = Integer
+type Scope = Int
 
 data Env = Env {
   scope :: Scope,
