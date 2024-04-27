@@ -1,5 +1,6 @@
 import System.IO
 import System.Environment
+import System.Exit (exitFailure)
 import ParSeeemcrd (myLexer, pProgram)
 import Typing.TypeCheck (typeCheck)
 
@@ -13,11 +14,15 @@ main = do
     [] -> putStrLn "No path provided, reading from stdin" >> getContents >>= runInterpreter
     _ -> putStrLn "Too many arguments provided"
 
-runInterpreter :: String -> IO()
+runInterpreter :: String -> IO ()
 runInterpreter code = do
   let tokens = myLexer code
   case pProgram tokens of
-    Left err -> putStrLn $ "Parse error: " ++ show err
+    Left err -> do
+      putStrLn $ "Parse error: " ++ show err
+      exitFailure
     Right tree -> case typeCheck tree of
-      Left err -> putStrLn $ "Type error: " ++ show err
+      Left err -> do
+        putStrLn $ "Type error: " ++ show err
+        exitFailure
       Right _ -> putStrLn "Type check successful" -- TODO: Interpreter here

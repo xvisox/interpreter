@@ -50,7 +50,15 @@ withNewScope env action = local (const $ newScope env) action
 -- Typechecking functions
 
 typeCheck :: Program -> Either TypeCheckError ()
-typeCheck (PProgram _ topDefs) = runExcept $ runReaderT (void $ typeCheckTopDefs topDefs) initEnv
+typeCheck (PProgram _ topDefs) = runExcept $ do
+  env <- runReaderT (typeCheckTopDefs topDefs) initEnvWithBuiltins
+  unless (hasValidMain env) $
+    throwError $ TypeCheckError Nothing MainFunctionMissing
+
+hasValidMain :: Env -> Bool
+hasValidMain env = case lookupVar (Ident "main") env of
+  Just (TCFun [] TCVoid, _) -> True
+  _ -> False
 
 typeCheckTopDefs :: [TopDef] -> TCM Env
 typeCheckTopDefs [] = ask
@@ -67,7 +75,7 @@ typeCheckTopDef (FnDef pos returnType ident args block) = do
   let argEnv = Prelude.foldl (\acc (varType, ident) -> insertVar ident varType acc) env $ mapToTypesWithIdents args
   env' <- local (const argEnv { hasReturn = False, returnType = returnType' }) $ typeCheckBlock block
 
-  unless (hasReturn env') $ throwTypeCheckError pos $ NoReturn ident
+  unless (hasReturn env' || returnType' == TCVoid) $ throwTypeCheckError pos $ NoReturn ident
   return env
 
 typeCheckItems :: TCType -> [Item] -> TCM Env
@@ -103,13 +111,16 @@ typeCheckExpr (EMul pos expr1 _ expr2) = do
   return TCInt
 
 typeCheckExpr (EAdd pos expr1 _ expr2) = do
-  ensureType pos TCInt expr1
-  ensureType pos TCInt expr2
-  return TCInt
+  exprType1 <- typeCheckExpr expr1
+  exprType2 <- typeCheckExpr expr2
+  case (exprType1, exprType2) of
+    (TCInt, TCInt) -> return TCInt
+    (TCString, TCString) -> return TCString
+    _ -> throwTypeCheckError pos $ TypeMismatch exprType1 exprType2
 
 typeCheckExpr (ERel pos expr1 _ expr2) = do
-  ensureType pos TCBool expr1
-  ensureType pos TCBool expr2
+  ensureType pos TCInt expr1
+  ensureType pos TCInt expr2
   return TCBool
 
 typeCheckExpr (EAnd pos expr1 expr2) = do
@@ -129,7 +140,7 @@ typeCheckExpr (ELambda pos returnType args block) = do
   let argEnv = Prelude.foldl (\acc (varType, ident) -> insertVar ident varType acc) env $ mapToTypesWithIdents args
   env' <- local (const argEnv { hasReturn = False, returnType = returnType' }) $ typeCheckBlock block
 
-  unless (hasReturn env') $ throwTypeCheckError pos $ NoReturn (Ident "lambda")
+  unless (hasReturn env' || returnType' == TCVoid) $ throwTypeCheckError pos $ NoReturn (Ident "lambda")
   return $ TCFun (mapToTCArgTypes args) returnType'
 
 typeCheckExpr (EApp pos ident exprs) = do

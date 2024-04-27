@@ -1,11 +1,11 @@
 void main() {
-    printStr("Hello Mum");                        // Hello Mum
-    printInt(21);                                 // 21
-    printBool(true);                              // true
-    printFun(int lambda(int x) => { return x; }); // lambda int(int)
+    printStr("Hello Mum"); // Hello Mum
+    printInt(21);          // 21
+    printBool(true);       // true
 
     printStr(toStr(21));
     printInt(toInt("15"));
+    exit();
 
     return;
 }

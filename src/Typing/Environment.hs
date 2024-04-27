@@ -4,6 +4,7 @@ import Data.Map
 import AbsSeeemcrd(Ident)
 
 import Typing.Types
+import Common(builtInFunctions)
 
 type Scope = Int
 
@@ -21,6 +22,11 @@ initEnv = Env {
   hasReturn = False,
   returnType = TCVoid
 }
+
+initEnvWithBuiltins :: Env
+initEnvWithBuiltins = Prelude.foldl insertBuiltIn initEnv builtInFunctions where
+  insertBuiltIn env (ident, (retType, argTypes)) =
+    insertVar ident (TCFun argTypes retType) env
 
 lookupVar :: Ident -> Env -> Maybe (TCType, Scope)
 lookupVar ident env = Data.Map.lookup ident (variables env)
