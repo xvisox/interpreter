@@ -1,0 +1,21 @@
+int hiii() {
+    int a = 5, b = 6;
+    if (a > b) {
+        if (a > 10) {
+            return 1;
+        }
+        else {
+            return 2;
+        }
+    } else {
+        if (b > 10) {
+            return 3;
+        } else {
+            return 4;
+        }
+    }
+}
+
+void main() {
+    int x = hiii();
+}
