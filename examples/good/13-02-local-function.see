@@ -1,0 +1,17 @@
+void main() {
+  int fun() {
+    return 10;
+  }
+
+  {
+    int fun() {
+      return 20;
+    }
+    printInt(fun());
+  }
+
+  {
+    printInt(fun());
+  }
+
+}

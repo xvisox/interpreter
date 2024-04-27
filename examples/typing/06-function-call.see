@@ -1,0 +1,6 @@
+void log(int number) {
+}
+
+void main() {
+  log("this is a string");
+}

@@ -44,9 +44,6 @@ ensureType pos expectedType expr = do
   unless (actualType == expectedType) $ throwTypeCheckError pos $ TypeMismatch expectedType actualType
   return actualType
 
-withNewScope :: Env -> TCM Env -> TCM Env
-withNewScope env action = local (const $ newScope env) action
-
 -- Typechecking functions
 
 typeCheck :: Program -> Either TypeCheckError ()
@@ -72,8 +69,8 @@ typeCheckTopDef (FnDef pos returnType ident args block) = do
   let returnType' = mapToTCType returnType
   env <- declareIdentOrThrow pos ident (TCFun (mapToTCArgTypes args) returnType')
 
-  let argEnv = Prelude.foldl (\acc (varType, ident) -> insertVar ident varType acc) env $ mapToTypesWithIdents args
-  env' <- local (const argEnv { hasReturn = False, returnType = returnType' }) $ typeCheckBlock block
+  let argEnv = Prelude.foldl (\acc (varType, ident) -> insertVar ident varType acc) (newScope env) $ mapToTypesWithIdents args
+  env' <- local (const argEnv { hasReturn = False, returnType = returnType', scope = scope env }) $ typeCheckBlock block
 
   unless (hasReturn env' || returnType' == TCVoid) $ throwTypeCheckError pos $ NoReturn ident
   return env
@@ -137,8 +134,8 @@ typeCheckExpr (ELambda pos returnType args block) = do
   let returnType' = mapToTCType returnType
   env <- ask
 
-  let argEnv = Prelude.foldl (\acc (varType, ident) -> insertVar ident varType acc) env $ mapToTypesWithIdents args
-  env' <- local (const argEnv { hasReturn = False, returnType = returnType' }) $ typeCheckBlock block
+  let argEnv = Prelude.foldl (\acc (varType, ident) -> insertVar ident varType acc) (newScope env) $ mapToTypesWithIdents args
+  env' <- local (const argEnv { hasReturn = False, returnType = returnType', scope = scope env }) $ typeCheckBlock block
 
   unless (hasReturn env' || returnType' == TCVoid) $ throwTypeCheckError pos $ NoReturn (Ident "lambda")
   return $ TCFun (mapToTCArgTypes args) returnType'
@@ -203,8 +200,8 @@ typeCheckStmt (CondElse pos expr ifBlock elseBlock) = do
   unless (exprType == TCBool) $ throwTypeCheckError pos $ TypeMismatch TCBool exprType
 
   env <- ask
-  ifEnv <- local (const $ newScope env) $ typeCheckBlock ifBlock
-  elseEnv <- local (const $ newScope env) $ typeCheckBlock elseBlock
+  ifEnv <- local (const env) $ typeCheckBlock ifBlock
+  elseEnv <- local (const env) $ typeCheckBlock elseBlock
   return $ if hasReturn ifEnv && hasReturn elseEnv
            then env { hasReturn = True }
            else env { hasReturn = hasReturn env }

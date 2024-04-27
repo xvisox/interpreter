@@ -1,0 +1,8 @@
+void testFunc() {
+  int local = 10;
+}
+
+void main() {
+  testFunc();
+  int x = local;
+}

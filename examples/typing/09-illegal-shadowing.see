@@ -1,0 +1,8 @@
+int compute(int x) {
+  int x = 20;
+  return x;
+}
+
+void main() {
+  compute(10);
+}
