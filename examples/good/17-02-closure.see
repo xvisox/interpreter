@@ -1,0 +1,11 @@
+int(int) retLambda() {
+    int x = 1;
+    return int lambda(int y) => {
+        return x + y;
+    };
+}
+
+void main() {
+    int(int) l = retLambda();
+    printInt(l(2));
+}

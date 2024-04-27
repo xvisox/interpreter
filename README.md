@@ -34,8 +34,8 @@ odnosząc się do nich przez referencję. To implikuje, że zarówno zmienne lok
 funkcję, chyba że są one zastąpione przez inne deklaracje. Funkcje te nie są dostępne poza zakresem otaczającej je
 funkcji.
 
-Język będzie posiadał kilka funkcji standardowych m.in. `printStr, printInt, printBool, printFun` oraz funkcje
-pomocnicze takie jak `toStr(int), toInt(str)` czy `exit(int)`.
+Język będzie posiadał kilka funkcji standardowych m.in. `printStr, printInt, printBool` oraz funkcje
+pomocnicze takie jak `toStr(int), toInt(str)` czy `exit()`.
 
 ### Tabelka cech
 
