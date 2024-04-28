@@ -28,8 +28,8 @@ declareIdent ident value = do
   put $ insertLoc loc value store
   return $ insertNewVar ident loc env
 
-lookupIdent :: Pos -> Ident -> IM IVal
-lookupIdent pos ident = do
+lookupIdent :: Ident -> IM IVal
+lookupIdent ident = do
   env <- ask
   store <- get
 
@@ -66,4 +66,58 @@ evalItem varType (NoInit _ ident) = declareIdent ident (mapToDefaultIVal varType
 evalItem varType (Init _ ident expr) = evalExpr expr >>= declareIdent ident
 
 evalExpr :: Expr -> IM IVal
-evalExpr _ = return IVoid
+evalExpr (EVar pos ident) = lookupIdent ident
+evalExpr (ELitInt _ int) = return $ IInt (fromIntegral int)
+evalExpr (ELitTrue _) = return $ IBool True
+evalExpr (ELitFalse _) = return $ IBool False
+evalExpr (EString _ string) = return $ IString string
+
+evalExpr (Neg _ expr) = do
+  IInt int <- evalExpr expr
+  return $ IInt (negate int)
+
+evalExpr (Not _ expr) = do
+  IBool bool <- evalExpr expr
+  return $ IBool (not bool)
+
+evalExpr (EMul pos expr1 op expr2) = do
+  IInt int1 <- evalExpr expr1
+  IInt int2 <- evalExpr expr2
+  case op of
+    Times _ -> return $ IInt (int1 * int2)
+    Div _ -> if int2 == 0
+      then throwRuntimeError pos DivisionByZero
+      else return $ IInt (int1 `div` int2)
+    Mod _ -> if int2 == 0
+      then throwRuntimeError pos DivisionByZero
+      else return $ IInt (int1 `mod` int2)
+
+evalExpr (EAdd pos expr1 op expr2) = do
+  IInt int1 <- evalExpr expr1
+  IInt int2 <- evalExpr expr2
+  case op of
+    Plus _ -> return $ IInt (int1 + int2)
+    Minus _ -> return $ IInt (int1 - int2)
+
+evalExpr (ERel pos expr1 op expr2) = do
+  IInt int1 <- evalExpr expr1
+  IInt int2 <- evalExpr expr2
+  case op of
+    LTH _ -> return $ IBool (int1 < int2)
+    LE _ -> return $ IBool (int1 <= int2)
+    GTH _ -> return $ IBool (int1 > int2)
+    GE _ -> return $ IBool (int1 >= int2)
+    EQU _ -> return $ IBool (int1 == int2)
+    NE _ -> return $ IBool (int1 /= int2)
+
+evalExpr (EAnd pos expr1 expr2) = do
+  IBool bool1 <- evalExpr expr1
+  IBool bool2 <- evalExpr expr2
+  return $ IBool (bool1 && bool2)
+
+evalExpr (EOr pos expr1 expr2) = do
+  IBool bool1 <- evalExpr expr1
+  IBool bool2 <- evalExpr expr2
+  return $ IBool (bool1 || bool2)
+
+evalExpr (EApp pos ident exprs) = ask -- TODO
