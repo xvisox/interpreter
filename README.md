@@ -15,8 +15,8 @@ miała nazwę `main`, gdzie zacznie się wykonywanie całego kodu.
 
 W języku możemy korzystać z trzech podstawowych typów: `int`, `bool`, `string` oraz dodatkowego typu dla funkcji
 `Type(ArgType)` gdzie `ArgType` to może być typ z referencją. Gdy nie przypiszemy wartości do zmiennej podstawowego typu
-podczas deklaracji, to zostają one ustawione na domyślną wartość. Nie tyczy się to jednak funkcji, podczas wywołania
-takiej funkcji program się zakończy z kodem błędu 1.
+podczas deklaracji, to zostają one ustawione na domyślną wartość. Nie tyczy się to jednak funkcji, zmienne tego typu
+muszą być zainicjalizowane, inaczej program nie przejdzie weryfikacji typów.
 
 W przypadku argumentów przekazywanych przez referencję `&`, możliwe jest przekazanie wyłącznie zmiennych; niemożliwe
 jest używanie stałych lub bezpośrednich wartości (na przykład wyniku operacji `2 + 2`,

@@ -82,6 +82,7 @@ typeCheckItems varType (item:items) = do
   local (const env) $ typeCheckItems varType items
 
 typeCheckItem :: TCType -> Item -> TCM Env
+typeCheckItem (TCFun _ _) (NoInit pos ident) = throwTypeCheckError pos $ FunctionNotDefined ident
 typeCheckItem varType (NoInit pos ident) = declareIdentOrThrow pos ident varType
 typeCheckItem varType (Init pos ident expr) = do
   exprType <- typeCheckExpr expr

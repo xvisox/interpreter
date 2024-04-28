@@ -19,6 +19,7 @@ data TypeCheckException
   | WrongArgumentCount Int Int
   | ArgumentMismatch TCArgType TCArgType
   | NoReturn Ident
+  | FunctionNotDefined Ident
   | MainFunctionMissing
 
 instance Show TypeCheckException where
@@ -29,4 +30,5 @@ instance Show TypeCheckException where
   show (WrongArgumentCount expected actual) = "Wrong argument count: expected " ++ show expected ++ ", got " ++ show actual
   show (ArgumentMismatch expected actual) = "Argument mismatch: expected " ++ show expected ++ ", got " ++ show actual
   show (NoReturn ident) = "No return statement in function: " ++ show ident
+  show (FunctionNotDefined ident) = "Function not defined: " ++ show ident
   show MainFunctionMissing = "Main function missing"
