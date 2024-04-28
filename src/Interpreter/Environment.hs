@@ -18,11 +18,14 @@ instance Show IVal where
   show (IString s) = s
   show (IRef l) = show l
   show IVoid = "void"
+  show (IFunc args _ _) = "function(" ++ show args ++ ")"
 
 mapToDefaultIVal :: Type -> IVal
 mapToDefaultIVal (Int _) = IInt 0
 mapToDefaultIVal (Bool _) = IBool False
 mapToDefaultIVal (Str _) = IString ""
+mapToDefaultIVal (Void _) = IVoid
+mapToDefaultIVal _ = error "Invalid type"
 
 type Loc = Int
 
@@ -32,8 +35,10 @@ newLoc store = Data.Map.size store
 insertLoc :: Loc -> IVal -> Store -> Store
 insertLoc loc val store = Data.Map.insert loc val store
 
-lookupLoc :: Loc -> Store -> Maybe IVal
-lookupLoc loc store = Data.Map.lookup loc store
+lookupLoc :: Loc -> Store -> IVal
+lookupLoc loc store = case Data.Map.lookup loc store of
+  Just val -> val
+  Nothing -> error $ "Location " ++ show loc ++ " not found in the store"
 
 type Store = Map Loc IVal
 
@@ -52,5 +57,7 @@ initEnv = Env {
 insertNewVar :: Ident -> Loc -> Env -> Env
 insertNewVar ident loc env = env { variables = insert ident loc (variables env) }
 
-lookupVar :: Ident -> Env -> Maybe Loc
-lookupVar ident env = Data.Map.lookup ident (variables env)
+lookupVar :: Ident -> Env -> Loc
+lookupVar ident env = case Data.Map.lookup ident (variables env) of
+  Just loc -> loc
+  Nothing -> error $ "Variable " ++ show ident ++ " not found in the environment"

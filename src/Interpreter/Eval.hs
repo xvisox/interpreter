@@ -1,6 +1,5 @@
 module Interpreter.Eval where
 
-import Data.Map
 import AbsSeeemcrd
 import Control.Monad.Reader
 import Control.Monad.State
@@ -15,7 +14,7 @@ import Interpreter.Exception
 type IM = ReaderT Env (ExceptT RuntimeError (StateT Store IO))
 
 throwRuntimeError :: Pos -> RuntimeException -> IM a
-throwRuntimeError pos error = throwError $ RuntimeError pos error
+throwRuntimeError pos err = throwError $ RuntimeError pos err
 
 -- Utility functions
 
@@ -33,8 +32,8 @@ lookupIdent ident = do
   env <- ask
   store <- get
 
-  let Just loc = lookupVar ident env
-  let Just value = lookupLoc loc store
+  let loc = lookupVar ident env
+  let value = lookupLoc loc store
   return value
 
 -- Interpreter functions
@@ -53,7 +52,7 @@ evalTopDefs (topDef:topDefs) = do
 
 evalTopDef :: TopDef -> IM Env
 evalTopDef (GlobalDef _ varType items) = evalItems varType items
-evalTopDef (FnDef pos varType ident args block) = ask -- TODO
+evalTopDef _ = ask -- TODO
 
 evalItems :: Type -> [Item] -> IM Env
 evalItems _ [] = ask
@@ -63,10 +62,10 @@ evalItems varType (item:items) = do
 
 evalItem :: Type -> Item -> IM Env
 evalItem varType (NoInit _ ident) = declareIdent ident (mapToDefaultIVal varType)
-evalItem varType (Init _ ident expr) = evalExpr expr >>= declareIdent ident
+evalItem _ (Init _ ident expr) = evalExpr expr >>= declareIdent ident
 
 evalExpr :: Expr -> IM IVal
-evalExpr (EVar pos ident) = lookupIdent ident
+evalExpr (EVar _ ident) = lookupIdent ident
 evalExpr (ELitInt _ int) = return $ IInt (fromIntegral int)
 evalExpr (ELitTrue _) = return $ IBool True
 evalExpr (ELitFalse _) = return $ IBool False
@@ -92,14 +91,14 @@ evalExpr (EMul pos expr1 op expr2) = do
       then throwRuntimeError pos DivisionByZero
       else return $ IInt (int1 `mod` int2)
 
-evalExpr (EAdd pos expr1 op expr2) = do
+evalExpr (EAdd _ expr1 op expr2) = do
   IInt int1 <- evalExpr expr1
   IInt int2 <- evalExpr expr2
   case op of
     Plus _ -> return $ IInt (int1 + int2)
     Minus _ -> return $ IInt (int1 - int2)
 
-evalExpr (ERel pos expr1 op expr2) = do
+evalExpr (ERel _ expr1 op expr2) = do
   IInt int1 <- evalExpr expr1
   IInt int2 <- evalExpr expr2
   case op of
@@ -110,14 +109,14 @@ evalExpr (ERel pos expr1 op expr2) = do
     EQU _ -> return $ IBool (int1 == int2)
     NE _ -> return $ IBool (int1 /= int2)
 
-evalExpr (EAnd pos expr1 expr2) = do
+evalExpr (EAnd _ expr1 expr2) = do
   IBool bool1 <- evalExpr expr1
   IBool bool2 <- evalExpr expr2
   return $ IBool (bool1 && bool2)
 
-evalExpr (EOr pos expr1 expr2) = do
+evalExpr (EOr _ expr1 expr2) = do
   IBool bool1 <- evalExpr expr1
   IBool bool2 <- evalExpr expr2
   return $ IBool (bool1 || bool2)
 
-evalExpr (EApp pos ident exprs) = ask -- TODO
+evalExpr _ = return IVoid -- TODO

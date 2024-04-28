@@ -1,6 +1,5 @@
 module Typing.TypeCheck where
 
-import Data.Map
 import AbsSeeemcrd
 import Control.Monad.Except
 import Control.Monad.Reader
@@ -16,7 +15,7 @@ import Typing.Environment
 type TCM = ReaderT Env (Except TypeCheckError)
 
 throwTypeCheckError :: Pos -> TypeCheckException -> TCM a
-throwTypeCheckError pos error = throwError $ TypeCheckError pos error
+throwTypeCheckError pos err = throwError $ TypeCheckError pos err
 
 -- Utility functions
 
@@ -69,14 +68,14 @@ typeCheckTopDef (FnDef pos returnType ident args block) = do
   let returnType' = mapToTCType returnType
   env <- declareIdentOrThrow pos ident (TCFun (mapToTCArgTypes args) returnType')
 
-  let argEnv = Prelude.foldl (\acc (varType, ident) -> insertVar ident varType acc) (newScope env) $ mapToTypesWithIdents args
+  let argEnv = Prelude.foldl (\acc (varType, ident') -> insertVar ident' varType acc) (newScope env) $ mapToTypesWithIdents args
   env' <- local (const argEnv { hasReturn = False, returnType = returnType', scope = scope env }) $ typeCheckBlock block
 
   unless (hasReturn env' || returnType' == TCVoid) $ throwTypeCheckError pos $ NoReturn ident
   return env
 
 typeCheckItems :: TCType -> [Item] -> TCM Env
-typeCheckItems varType [] = ask
+typeCheckItems _ [] = ask
 typeCheckItems varType (item:items) = do
   env <- typeCheckItem varType item
   local (const env) $ typeCheckItems varType items
@@ -103,10 +102,7 @@ typeCheckExpr (EVar pos ident) = do
     Just (varType, _) -> return varType
     Nothing -> throwTypeCheckError pos $ NoVariable ident
 
-typeCheckExpr (EMul pos expr1 _ expr2) = do
-  ensureType pos TCInt expr1
-  ensureType pos TCInt expr2
-  return TCInt
+typeCheckExpr (EMul pos expr1 _ expr2) = ensureType pos TCInt expr1 >> ensureType pos TCInt expr2 >> return TCInt
 
 typeCheckExpr (EAdd pos expr1 _ expr2) = do
   exprType1 <- typeCheckExpr expr1
@@ -116,26 +112,17 @@ typeCheckExpr (EAdd pos expr1 _ expr2) = do
     (TCString, TCString) -> return TCString
     _ -> throwTypeCheckError pos $ TypeMismatch exprType1 exprType2
 
-typeCheckExpr (ERel pos expr1 _ expr2) = do
-  ensureType pos TCInt expr1
-  ensureType pos TCInt expr2
-  return TCBool
+typeCheckExpr (ERel pos expr1 _ expr2) = ensureType pos TCInt expr1 >> ensureType pos TCInt expr2 >> return TCBool
 
-typeCheckExpr (EAnd pos expr1 expr2) = do
-  ensureType pos TCBool expr1
-  ensureType pos TCBool expr2
-  return TCBool
+typeCheckExpr (EAnd pos expr1 expr2) = ensureType pos TCBool expr1 >> ensureType pos TCBool expr2 >> return TCBool
 
-typeCheckExpr (EOr pos expr1 expr2) = do
-  ensureType pos TCBool expr1
-  ensureType pos TCBool expr2
-  return TCBool
+typeCheckExpr (EOr pos expr1 expr2) = ensureType pos TCBool expr1 >> ensureType pos TCBool expr2 >> return TCBool
 
 typeCheckExpr (ELambda pos returnType args block) = do
   let returnType' = mapToTCType returnType
   env <- ask
 
-  let argEnv = Prelude.foldl (\acc (varType, ident) -> insertVar ident varType acc) (newScope env) $ mapToTypesWithIdents args
+  let argEnv = Prelude.foldl (\acc (varType, ident') -> insertVar ident' varType acc) (newScope env) $ mapToTypesWithIdents args
   env' <- local (const argEnv { hasReturn = False, returnType = returnType', scope = scope env }) $ typeCheckBlock block
 
   unless (hasReturn env' || returnType' == TCVoid) $ throwTypeCheckError pos $ NoReturn (Ident "lambda")

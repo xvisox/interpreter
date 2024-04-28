@@ -1,12 +1,13 @@
 GHC = ghc
 SRC = src
 DIRS = $(shell find $(SRC) -type d)
-TARGETS = $(foreach dir,$(DIRS),$(wildcard $(dir)/*.hs))
+TARGETS = $(wildcard $(SRC)/**/*.hs)
+
+.PHONY: all clean
 
 all: $(TARGETS)
-	$(GHC) --make $(SRC)/Main.hs -isrc -o interpreter
+	$(GHC) --make $(SRC)/Main.hs -isrc -o interpreter -Wall
 
 clean:
 	rm -f interpreter
-	find $(SRC) -type f -name '*.hi' -delete
-	find $(SRC) -type f -name '*.o' -delete
+	find $(SRC) -type f \( -name '*.hi' -o -name '*.o' \) -delete
