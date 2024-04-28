@@ -1,8 +1,9 @@
 import System.IO
 import System.Environment
-import System.Exit (exitFailure)
+import System.Exit (exitFailure, exitSuccess)
 import ParSeeemcrd (myLexer, pProgram)
 import Typing.TypeCheck (typeCheck)
+import Interpreter.Eval (evaluate)
 
 main :: IO()
 main = do
@@ -19,10 +20,19 @@ runInterpreter code = do
   let tokens = myLexer code
   case pProgram tokens of
     Left err -> do
-      putStrLn $ "Parse error: " ++ show err
+      putStrError $ "Parse error: " ++ show err
       exitFailure
     Right tree -> case typeCheck tree of
       Left err -> do
-        putStrLn $ "Type error: " ++ show err
+        putStrError $ "Type error: " ++ show err
         exitFailure
-      Right _ -> putStrLn "Type check successful" -- TODO: Interpreter here
+      Right _ -> do
+        (result, _) <- evaluate tree
+        case result of
+          Left err -> do
+            putStrError $ "Runtime error: " ++ show err
+            exitFailure
+          Right _ -> exitSuccess
+
+putStrError :: String -> IO ()
+putStrError = hPutStrLn stderr
