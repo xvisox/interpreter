@@ -1,6 +1,7 @@
 module Interpreter.Eval where
 
 import AbsSeeemcrd
+import Control.Monad
 import Control.Monad.Reader
 import Control.Monad.State
 import Control.Monad.Except
@@ -52,7 +53,13 @@ evalTopDefs (topDef:topDefs) = do
 
 evalTopDef :: TopDef -> IM Env
 evalTopDef (GlobalDef _ varType items) = evalItems varType items
-evalTopDef _ = ask -- TODO
+evalTopDef (FnDef _ _ ident args block) = do
+  let argsIdents = map (\(AArg _ _ argIdent) -> argIdent) args
+  let argsKinds = map (\(AArg _ argKind _) -> case argKind of
+        ValArg _ _ -> IArgVal
+        RefArg _ _ -> IArgRef) args
+  env <- ask
+  declareIdent ident $ IFunc (zip argsKinds argsIdents) block env
 
 evalItems :: Type -> [Item] -> IM Env
 evalItems _ [] = ask
@@ -119,4 +126,30 @@ evalExpr (EOr _ expr1 expr2) = do
   IBool bool2 <- evalExpr expr2
   return $ IBool (bool1 || bool2)
 
-evalExpr _ = return IVoid -- TODO
+evalExpr (ELambda _ _ args block) = do
+  let argsIdents = map (\(AArg _ _ argIdent) -> argIdent) args
+  let argsKinds = map (\(AArg _ argKind _) -> case argKind of
+        ValArg _ _ -> IArgVal
+        RefArg _ _ -> IArgRef) args
+  env <- ask
+  return $ IFunc (zip argsKinds argsIdents) block env
+
+evalExpr (EApp pos ident exprs) = do
+  IFunc args block closure <- lookupIdent ident
+
+  let argExprPairs = zip args exprs
+  env <- foldM (\env (arg, expr) -> do
+    case arg of
+      (IArgVal, argIdent) -> do
+        value <- evalExpr expr
+        declareIdent argIdent value
+      (IArgRef, argIdent) -> case expr of
+        EVar _ var -> do
+          let loc = lookupVar var env
+          return $ insertNewVar argIdent loc env
+        _ -> throwRuntimeError pos $ UnexpectedError
+    ) closure argExprPairs
+  local (const env) $ (evalBlock block >> return IVoid)
+
+evalBlock :: Block -> IM Env
+evalBlock _ = ask

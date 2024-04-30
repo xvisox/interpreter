@@ -1,6 +1,7 @@
 module Interpreter.Exception where
 
 import Prelude
+import Interpreter.Environment
 import Common
 
 data RuntimeError = RuntimeError Pos RuntimeException
@@ -10,8 +11,10 @@ instance Show RuntimeError where
 
 data RuntimeException
   = DivisionByZero
-  | UndefinedVariable
+  | UnexpectedError
+  | ReturnFlag IVal
 
 instance Show RuntimeException where
   show DivisionByZero = "Division by zero"
-  show UndefinedVariable = "Undefined variable"
+  show UnexpectedError = "Unexpected error"
+  show (ReturnFlag val) = "Return " ++ show val

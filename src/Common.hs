@@ -10,10 +10,10 @@ showPos (Just (line, column)) = "line " ++ show line ++ ", column " ++ show colu
 
 builtInFunctions :: [(Ident, (TCType, [TCArgType]))]
 builtInFunctions = [
-    (Ident "printStr", (TCVoid, [TCArgType TCVal TCString])),
-    (Ident "printInt", (TCVoid, [TCArgType TCVal TCInt])),
-    (Ident "printBool", (TCVoid, [TCArgType TCVal TCBool])),
-    (Ident "toStr", (TCString, [TCArgType TCVal TCInt])),
-    (Ident "toInt", (TCInt, [TCArgType TCVal TCString])),
+    (Ident "printStr", (TCVoid, [TCArgType TCArgVal TCString])),
+    (Ident "printInt", (TCVoid, [TCArgType TCArgVal TCInt])),
+    (Ident "printBool", (TCVoid, [TCArgType TCArgVal TCBool])),
+    (Ident "toStr", (TCString, [TCArgType TCArgVal TCInt])),
+    (Ident "toInt", (TCInt, [TCArgType TCArgVal TCString])),
     (Ident "exit", (TCVoid, []))
   ]

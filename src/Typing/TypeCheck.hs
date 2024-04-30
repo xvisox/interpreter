@@ -141,8 +141,8 @@ typeCheckExpr (EApp pos ident exprs) = do
       let argExprPairs = zip args exprs
       forM_ argExprPairs $ \((TCArgType argKind argType), expr) -> do
         exprType <- typeCheckExpr expr
-        exprKind <- if isVarExpr expr then return TCRef else return TCVal
-        when (argType /= exprType || (argKind /= exprKind && argKind /= TCVal)) $
+        exprKind <- if isVarExpr expr then return TCArgRef else return TCArgVal
+        when (argType /= exprType || (argKind /= exprKind && argKind /= TCArgVal)) $
           throwTypeCheckError pos $ ArgumentMismatch (TCArgType argKind argType) (TCArgType exprKind exprType)
       return returnType
     Just _ -> throwTypeCheckError pos $ NotAFunction ident

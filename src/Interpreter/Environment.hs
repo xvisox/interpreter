@@ -3,22 +3,22 @@ module Interpreter.Environment where
 import Data.Map
 import AbsSeeemcrd
 
-type IArg = Ident
+data IArgKind = IArgRef | IArgVal
+
+type IArg = (IArgKind, Ident)
 
 data IVal = IInt Int
           | IBool Bool
           | IString String
-          | IRef Loc
-          | IVoid
           | IFunc [IArg] Block Env
+          | IVoid
 
 instance Show IVal where
   show (IInt i) = show i
   show (IBool b) = show b
   show (IString s) = s
-  show (IRef l) = show l
+  show (IFunc _ _ _) = "function"
   show IVoid = "void"
-  show (IFunc args _ _) = "function(" ++ show args ++ ")"
 
 mapToDefaultIVal :: Type -> IVal
 mapToDefaultIVal (Int _) = IInt 0
