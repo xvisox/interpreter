@@ -1,6 +1,7 @@
 module Interpreter.Environment where
 
 import Data.Map
+import Data.Maybe(fromJust)
 import AbsSeeemcrd
 
 data IArgKind = IArgRef | IArgVal
@@ -36,9 +37,7 @@ insertLoc :: Loc -> IVal -> Store -> Store
 insertLoc loc val store = Data.Map.insert loc val store
 
 lookupLoc :: Loc -> Store -> IVal
-lookupLoc loc store = case Data.Map.lookup loc store of
-  Just val -> val
-  Nothing -> error $ "Location " ++ show loc ++ " not found in the store"
+lookupLoc loc store = fromJust $ Data.Map.lookup loc store
 
 type Store = Map Loc IVal
 
@@ -58,6 +57,4 @@ insertNewVar :: Ident -> Loc -> Env -> Env
 insertNewVar ident loc env = env { variables = insert ident loc (variables env) }
 
 lookupVar :: Ident -> Env -> Loc
-lookupVar ident env = case Data.Map.lookup ident (variables env) of
-  Just loc -> loc
-  Nothing -> error $ "Variable " ++ show ident ++ " not found in the environment"
+lookupVar ident env = fromJust $ Data.Map.lookup ident (variables env)

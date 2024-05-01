@@ -149,7 +149,79 @@ evalExpr (EApp pos ident exprs) = do
           return $ insertNewVar argIdent loc env
         _ -> throwRuntimeError pos $ UnexpectedError
     ) closure argExprPairs
-  local (const env) $ (evalBlock block >> return IVoid)
+  local (const env) $ (evalBlock block >> return IVoid) `catchError` (\err -> case err of
+    RuntimeError _ (ReturnFlag value) -> return value
+    _ -> throwError err)
 
 evalBlock :: Block -> IM Env
-evalBlock _ = ask
+evalBlock (BBlock _ stmts) = do
+  env <- ask
+  local (const env) $ evalStmts stmts
+
+evalStmts :: [Stmt] -> IM Env
+evalStmts [] = ask
+evalStmts (stmt:stmts) = do
+  env <- evalStmt stmt
+  local (const env) $ evalStmts stmts
+
+evalStmt :: Stmt -> IM Env
+evalStmt (BStmt _ block) = evalBlock block >> ask
+evalStmt (DStmt _ topDef) = evalTopDef topDef
+evalStmt (Ass _ ident expr) = do
+  value <- evalExpr expr
+  env <- ask
+  let loc = lookupVar ident env
+
+  store <- get
+  put $ insertLoc loc value store
+  return env
+
+evalStmt (Incr pos ident) = do
+  env <- ask
+  let loc = lookupVar ident env
+
+  store <- get
+  case lookupLoc loc store of
+    IInt value -> do
+      let newValue = IInt (value + 1)
+      put $ insertLoc loc newValue store
+      return env
+    _ -> throwRuntimeError pos UnexpectedError
+
+evalStmt (Decr pos ident) = do
+  env <- ask
+  let loc = lookupVar ident env
+
+  store <- get
+  case lookupLoc loc store of
+    IInt value -> do
+      let newValue = IInt (value - 1)
+      put $ insertLoc loc newValue store
+      return env
+    _ -> throwRuntimeError pos UnexpectedError
+
+evalStmt (Ret pos expr) = do
+  value <- evalExpr expr
+  throwRuntimeError pos (ReturnFlag value)
+
+evalStmt (VRet pos) = throwRuntimeError pos (ReturnFlag IVoid)
+
+evalStmt (Cond _ expr block) = do
+  IBool bool <- evalExpr expr
+  if bool
+    then evalBlock block >> ask
+    else ask
+
+evalStmt (CondElse _ expr ifBlock elseBlock) = do
+  IBool bool <- evalExpr expr
+  if bool
+    then evalBlock ifBlock >> ask
+    else evalBlock elseBlock >> ask
+
+evalStmt (While _ expr block) = do
+  IBool bool <- evalExpr expr
+  if bool
+    then evalBlock block >> evalStmt (While Nothing expr block)
+    else ask
+
+evalStmt (SExp _ expr) = evalExpr expr >> ask
