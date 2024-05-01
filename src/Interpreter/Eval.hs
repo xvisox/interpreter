@@ -143,7 +143,11 @@ evalExpr (EApp pos ident exprs) = do
     then evalBuiltInFunction ident =<< mapM evalExpr exprs
     else do
       callEnv <- ask
-      IFunc args block closure <- lookupIdent ident
+      callStore <- get
+
+      let functionLoc = lookupVar ident callEnv
+      let IFunc args block closure = lookupLoc functionLoc callStore
+      let recursiveEnv = insertNewVar ident functionLoc closure
 
       env <- foldM (\env (arg, expr) -> do
         case arg of
@@ -158,7 +162,7 @@ evalExpr (EApp pos ident exprs) = do
               let loc = lookupVar var callEnv
               return $ insertNewVar argIdent loc env
             _ -> throwRuntimeError pos UnexpectedError
-        ) closure $ zip args exprs
+        ) recursiveEnv $ zip args exprs
 
       local (const env) $ (evalBlock block >> return IVoid) `catchError` (\err -> case err of
         RuntimeError _ (ReturnFlag value) -> return value
