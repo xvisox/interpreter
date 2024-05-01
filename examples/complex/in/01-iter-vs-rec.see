@@ -1,0 +1,33 @@
+int factorialRecursive(int n) {
+    if (n == 0) {
+        return 1;
+    } else {
+        return n * factorialRecursive(n - 1);
+    }
+}
+
+int factorialIterative(int n) {
+    int result = 1;
+    int i = 1;
+    while (i <= n) {
+        result = result * i;
+        i++;
+    }
+    return result;
+}
+
+void main() {
+    int num = 5;
+
+    int recResult = factorialRecursive(num);
+    printStr("Recursive factorial of " + toStr(num) + " is " + toStr(recResult));
+
+    int iterResult = factorialIterative(num);
+    printStr("Iterative factorial of " + toStr(num) + " is " + toStr(iterResult));
+
+    if (recResult == iterResult) {
+        printStr("Both implementations agree.");
+    } else {
+        printStr("There is a discrepancy between the implementations.");
+    }
+}

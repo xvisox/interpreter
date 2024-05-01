@@ -1,0 +1,37 @@
+int abc() {
+    int ile = 3;
+
+    int abc () {
+        printInt(ile);
+        ile--;
+        if (ile > 0) {
+            return abc();
+        }
+        return 2115;
+    }
+
+    return abc();
+}
+
+void def() {
+    int ile = 3;
+
+    int def(int val) {
+        printInt(val);
+        val--;
+        ile--;
+        if (val > 0) {
+            return def(val);
+        }
+        return 2115;
+    }
+
+    int druga = 3;
+    def(druga);
+    printStr(toStr(ile) + " " + toStr(druga));
+}
+
+void main() {
+    printInt(abc());
+    def();
+}

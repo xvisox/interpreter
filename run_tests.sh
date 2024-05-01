@@ -33,6 +33,7 @@ test_files() {
 }
 
 test_files "./examples/good" 0
+test_files "./examples/complex" 0
 test_files "./examples/bad" 1
 test_files "./examples/typing" 1
 
