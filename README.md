@@ -35,7 +35,7 @@ funkcję, chyba że są one zastąpione przez inne deklaracje. Funkcje te nie s�
 funkcji.
 
 Język będzie posiadał kilka funkcji standardowych m.in. `printStr, printInt, printBool` oraz funkcje
-pomocnicze takie jak `toStr(int), toInt(str)` czy `exit()`.
+pomocnicze takie jak `toStr(int), toInt(str)`.
 
 ### Tabelka cech
 

@@ -106,12 +106,12 @@ typeCheckExpr (EVar pos ident) = do
 
 typeCheckExpr (EMul pos expr1 _ expr2) = ensureType pos TCInt expr1 >> ensureType pos TCInt expr2 >> return TCInt
 
-typeCheckExpr (EAdd pos expr1 _ expr2) = do
+typeCheckExpr (EAdd pos expr1 op expr2) = do
   exprType1 <- typeCheckExpr expr1
   exprType2 <- typeCheckExpr expr2
-  case (exprType1, exprType2) of
-    (TCInt, TCInt) -> return TCInt
-    (TCString, TCString) -> return TCString
+  case (exprType1, exprType2, op) of
+    (TCInt, TCInt, _) -> return TCInt
+    (TCString, TCString, Plus _) -> return TCString
     _ -> throwTypeCheckError pos $ TypeMismatch exprType1 exprType2
 
 typeCheckExpr (ERel pos expr1 _ expr2) = ensureType pos TCInt expr1 >> ensureType pos TCInt expr2 >> return TCBool

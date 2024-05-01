@@ -4,7 +4,7 @@ void main() {
     }
 
     if (false) {
-        // whoops
+        printStr("not reachable");
     } else {
         printStr("else branch");
     }

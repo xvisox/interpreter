@@ -43,7 +43,9 @@ evaluate :: Program -> IO (Either RuntimeError (), Store)
 evaluate program = runStateT (runExceptT (runReaderT (evalProgram program) initEnv)) initStore
 
 evalProgram :: Program -> IM ()
-evalProgram (PProgram _ topDefs) = evalTopDefs topDefs >> return ()
+evalProgram (PProgram _ topDefs) = do
+  env <- evalTopDefs topDefs
+  local (const env) $ evalExpr (EApp Nothing (Ident "main") []) >> return ()
 
 evalTopDefs :: [TopDef] -> IM Env
 evalTopDefs [] = ask
@@ -98,12 +100,14 @@ evalExpr (EMul pos expr1 op expr2) = do
       then throwRuntimeError pos DivisionByZero
       else return $ IInt (int1 `mod` int2)
 
-evalExpr (EAdd _ expr1 op expr2) = do
-  IInt int1 <- evalExpr expr1
-  IInt int2 <- evalExpr expr2
-  case op of
-    Plus _ -> return $ IInt (int1 + int2)
-    Minus _ -> return $ IInt (int1 - int2)
+evalExpr (EAdd pos expr1 op expr2) = do
+  val1 <- evalExpr expr1
+  val2 <- evalExpr expr2
+  case (val1, val2, op) of
+    (IInt int1, IInt int2, Plus _) -> return $ IInt (int1 + int2)
+    (IInt int1, IInt int2, Minus _) -> return $ IInt (int1 - int2)
+    (IString str1, IString str2, Plus _) -> return $ IString (str1 ++ str2)
+    _ -> throwRuntimeError pos UnexpectedError
 
 evalExpr (ERel _ expr1 op expr2) = do
   IInt int1 <- evalExpr expr1
@@ -135,23 +139,25 @@ evalExpr (ELambda _ _ args block) = do
   return $ IFunc (zip argsKinds argsIdents) block env
 
 evalExpr (EApp pos ident exprs) = do
-  IFunc args block closure <- lookupIdent ident
-
-  let argExprPairs = zip args exprs
-  env <- foldM (\env (arg, expr) -> do
-    case arg of
-      (IArgVal, argIdent) -> do
-        value <- evalExpr expr
-        declareIdent argIdent value
-      (IArgRef, argIdent) -> case expr of
-        EVar _ var -> do
-          let loc = lookupVar var env
-          return $ insertNewVar argIdent loc env
-        _ -> throwRuntimeError pos $ UnexpectedError
-    ) closure argExprPairs
-  local (const env) $ (evalBlock block >> return IVoid) `catchError` (\err -> case err of
-    RuntimeError _ (ReturnFlag value) -> return value
-    _ -> throwError err)
+  if isBuiltInFunction ident
+    then evalBuiltInFunction ident =<< mapM evalExpr exprs
+    else do
+      IFunc args block closure <- lookupIdent ident
+      let argExprPairs = zip args exprs
+      env <- foldM (\env (arg, expr) -> do
+        case arg of
+          (IArgVal, argIdent) -> do
+            value <- evalExpr expr
+            declareIdent argIdent value
+          (IArgRef, argIdent) -> case expr of
+            EVar _ var -> do
+              let loc = lookupVar var env
+              return $ insertNewVar argIdent loc env
+            _ -> throwRuntimeError pos UnexpectedError
+        ) closure argExprPairs
+      local (const env) $ (evalBlock block >> return IVoid) `catchError` (\err -> case err of
+        RuntimeError _ (ReturnFlag value) -> return value
+        _ -> throwError err)
 
 evalBlock :: Block -> IM Env
 evalBlock (BBlock _ stmts) = do
@@ -225,3 +231,13 @@ evalStmt (While _ expr block) = do
     else ask
 
 evalStmt (SExp _ expr) = evalExpr expr >> ask
+
+evalBuiltInFunction :: Ident -> [IVal] -> IM IVal
+evalBuiltInFunction (Ident "printStr") [IString string] = liftIO $ putStrLn string >> return IVoid
+evalBuiltInFunction (Ident "printInt") [IInt int] = liftIO $ print int >> return IVoid
+evalBuiltInFunction (Ident "printBool") [IBool bool] = liftIO $ print bool >> return IVoid
+evalBuiltInFunction (Ident "toStr") [IInt int] = return $ IString (show int)
+evalBuiltInFunction (Ident "toInt") [IString string] = case reads string of
+  [(int, "")] -> return $ IInt int
+  _ -> throwRuntimeError Nothing UnexpectedError
+evalBuiltInFunction _ _ = throwRuntimeError Nothing UnexpectedError

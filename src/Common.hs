@@ -14,6 +14,8 @@ builtInFunctions = [
     (Ident "printInt", (TCVoid, [TCArgType TCArgVal TCInt])),
     (Ident "printBool", (TCVoid, [TCArgType TCArgVal TCBool])),
     (Ident "toStr", (TCString, [TCArgType TCArgVal TCInt])),
-    (Ident "toInt", (TCInt, [TCArgType TCArgVal TCString])),
-    (Ident "exit", (TCVoid, []))
+    (Ident "toInt", (TCInt, [TCArgType TCArgVal TCString]))
   ]
+
+isBuiltInFunction :: Ident -> Bool
+isBuiltInFunction ident = ident `elem` map fst builtInFunctions

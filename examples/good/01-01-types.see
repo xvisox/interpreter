@@ -1,12 +1,12 @@
 void main() {
-    int n = 21;
-    n = 15;
+    int n = 21; printInt(n);
+    n = 15; printInt(n);
 
-    string s = "Hello World";
-    s = "Hello";
+    string s = "Hello World"; printStr(s);
+    s = "Hello"; printStr(s);
 
-    bool b = true;
-    b = false;
+    bool b = true; printBool(b);
+    b = false; printBool(b);
 
     return;
 }
