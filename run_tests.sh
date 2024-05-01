@@ -32,8 +32,8 @@ test_files() {
     done
 }
 
-test_files "./examples/good" 0
-#test_files "./examples/in/bad" 1
+#test_files "./examples/good" 0
+test_files "./examples/bad" 1
 #test_files "./examples/in/typing" 1
 
 echo "All tests passed."
