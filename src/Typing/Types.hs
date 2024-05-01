@@ -4,13 +4,13 @@ import AbsSeeemcrd
 import Prelude
 
 data TCArgKind
-  = TCRef
-  | TCVal
+  = TCArgRef
+  | TCArgVal
   deriving (Eq, Read)
 
 instance Show TCArgKind where
-  show TCRef = "&"
-  show TCVal = ""
+  show TCArgRef = "&"
+  show TCArgVal = ""
 
 data TCType
   = TCFun [TCArgType] TCType
@@ -44,8 +44,8 @@ mapToTCType (Void _) = TCVoid
 mapToTCType (Fun _ returnType args) = TCFun (Prelude.map mapToTCArgType args) (mapToTCType returnType)
 
 mapToTCArgType :: ArgType -> TCArgType
-mapToTCArgType (ValArg _ argType) = TCArgType TCVal (mapToTCType argType)
-mapToTCArgType (RefArg _ argType) = TCArgType TCRef (mapToTCType argType)
+mapToTCArgType (ValArg _ argType) = TCArgType TCArgVal (mapToTCType argType)
+mapToTCArgType (RefArg _ argType) = TCArgType TCArgRef (mapToTCType argType)
 
 mapToTCArgTypes :: [Arg] -> [TCArgType]
 mapToTCArgTypes = Prelude.map (\(AArg _ argType _) -> mapToTCArgType argType)

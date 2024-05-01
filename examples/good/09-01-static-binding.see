@@ -13,6 +13,7 @@ void main() {
     }
 
     printInt(nested()); // 21
+    printInt(g); // 12345
 
     return;
 }

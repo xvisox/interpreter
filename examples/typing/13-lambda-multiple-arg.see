@@ -1,0 +1,5 @@
+void main() {
+    int lambda(int x, int x) => {
+        return x;
+    };
+}

@@ -5,7 +5,6 @@ void main() {
 
     printStr(toStr(21));
     printInt(toInt("15"));
-    exit();
 
     return;
 }
