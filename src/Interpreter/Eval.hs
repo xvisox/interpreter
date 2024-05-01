@@ -142,19 +142,24 @@ evalExpr (EApp pos ident exprs) = do
   if isBuiltInFunction ident
     then evalBuiltInFunction ident =<< mapM evalExpr exprs
     else do
+      callEnv <- ask
       IFunc args block closure <- lookupIdent ident
-      let argExprPairs = zip args exprs
+
       env <- foldM (\env (arg, expr) -> do
         case arg of
           (IArgVal, argIdent) -> do
             value <- evalExpr expr
-            declareIdent argIdent value
+            store <- get
+            let loc = newLoc store
+            put $ insertLoc loc value store
+            return $ insertNewVar argIdent loc env
           (IArgRef, argIdent) -> case expr of
             EVar _ var -> do
-              let loc = lookupVar var env
+              let loc = lookupVar var callEnv
               return $ insertNewVar argIdent loc env
             _ -> throwRuntimeError pos UnexpectedError
-        ) closure argExprPairs
+        ) closure $ zip args exprs
+
       local (const env) $ (evalBlock block >> return IVoid) `catchError` (\err -> case err of
         RuntimeError _ (ReturnFlag value) -> return value
         _ -> throwError err)

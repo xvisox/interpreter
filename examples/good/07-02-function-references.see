@@ -13,9 +13,9 @@ void callFunction(void() &func) {
 }
 
 void main() {
-    void() func = hello;
-    callFunction(func);
-    func(); // Goodbye, World!
+    void() fun = hello;
+    callFunction(fun);
+    fun(); // Goodbye, World!
 
     return;
 }

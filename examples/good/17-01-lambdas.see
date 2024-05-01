@@ -1,5 +1,5 @@
-int apply(int(int) fun, int val) {
-    return fun(val);
+int apply(int(int) f, int val) {
+    return f(val);
 }
 
 void learnRef(void(int&) fun, int &val) { // <- reference to val, important in this case

@@ -5,6 +5,7 @@ import Data.Maybe(fromJust)
 import AbsSeeemcrd
 
 data IArgKind = IArgRef | IArgVal
+  deriving (Show)
 
 type IArg = (IArgKind, Ident)
 
@@ -18,7 +19,7 @@ instance Show IVal where
   show (IInt i) = show i
   show (IBool b) = show b
   show (IString s) = s
-  show (IFunc _ _ _) = "function"
+  show (IFunc args _ _) = "fun(" ++ show args ++ ")"
   show IVoid = "void"
 
 mapToDefaultIVal :: Type -> IVal
@@ -46,7 +47,7 @@ initStore = Data.Map.empty
 
 data Env = Env {
   variables :: Map Ident Loc
-}
+} deriving Show
 
 initEnv :: Env
 initEnv = Env {

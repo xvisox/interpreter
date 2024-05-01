@@ -1,17 +1,16 @@
 void main() {
-  int fun() {
-    return 10;
-  }
-
-  {
     int fun() {
-      return 20;
+      return 15;
     }
-    printInt(fun());
-  }
 
-  {
-    printInt(fun());
-  }
+    {
+        int fun() {
+            return 21;
+        }
+        printInt(fun()); // 21
+    }
 
+    {
+        printInt(fun()); // 15
+    }
 }

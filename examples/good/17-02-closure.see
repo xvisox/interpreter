@@ -1,5 +1,5 @@
 int(int) retLambda() {
-    int x = 1;
+    int x = 6;
     return int lambda(int y) => {
         return x + y;
     };
@@ -7,5 +7,5 @@ int(int) retLambda() {
 
 void main() {
     int(int) l = retLambda();
-    printInt(l(2));
+    printInt(l(15)); // 21
 }
