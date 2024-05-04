@@ -121,7 +121,7 @@ evalExpr (EOr _ expr1 expr2) = do
 
 evalExpr (EApp pos ident exprs) = do
   if isBuiltInFunction ident
-    then evalBuiltInFunction ident =<< mapM evalExpr exprs
+    then evalBuiltInFunction pos ident =<< mapM evalExpr exprs
     else do
       callEnv <- ask
       callStore <- get
@@ -218,12 +218,12 @@ evalStmt (While _ expr block) = do
     then evalBlock block >> evalStmt (While Nothing expr block)
     else ask
 
-evalBuiltInFunction :: Ident -> [IVal] -> IM IVal
-evalBuiltInFunction (Ident "printStr") [IString string] = liftIO $ putStrLn string >> return IVoid
-evalBuiltInFunction (Ident "printInt") [IInt int] = liftIO $ print int >> return IVoid
-evalBuiltInFunction (Ident "printBool") [IBool bool] = liftIO $ print bool >> return IVoid
-evalBuiltInFunction (Ident "toStr") [IInt int] = return $ IString (show int)
-evalBuiltInFunction (Ident "toInt") [IString string] = case reads string of
+evalBuiltInFunction :: Pos -> Ident -> [IVal] -> IM IVal
+evalBuiltInFunction _ (Ident "printStr") [IString string] = liftIO $ putStrLn string >> return IVoid
+evalBuiltInFunction _ (Ident "printInt") [IInt int] = liftIO $ print int >> return IVoid
+evalBuiltInFunction _ (Ident "printBool") [IBool bool] = liftIO $ print bool >> return IVoid
+evalBuiltInFunction _ (Ident "toStr") [IInt int] = return $ IString (show int)
+evalBuiltInFunction pos (Ident "toInt") [IString string] = case reads string of
   [(int, "")] -> return $ IInt int
-  _ -> throwRuntimeError Nothing UnexpectedError
-evalBuiltInFunction _ _ = throwRuntimeError Nothing UnexpectedError
+  _ -> throwRuntimeError pos $ IntegerParseError string
+evalBuiltInFunction pos _ _ = throwRuntimeError pos UnexpectedError

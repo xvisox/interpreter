@@ -4,6 +4,7 @@ void main() {
         printInt(t);
         t--;
     }
+    printInt(t);
 
     return;
 }

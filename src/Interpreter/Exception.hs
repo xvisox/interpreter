@@ -10,10 +10,12 @@ instance Show RuntimeError where
 
 data RuntimeException
   = DivisionByZero
+  | IntegerParseError String
   | UnexpectedError
   | ReturnFlag IVal
 
 instance Show RuntimeException where
   show DivisionByZero = "Division by zero"
   show UnexpectedError = "Unexpected error"
+  show (IntegerParseError str) = "Cannot parse integer: " ++ str
   show (ReturnFlag val) = "Return " ++ show val
