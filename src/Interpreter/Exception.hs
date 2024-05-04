@@ -1,8 +1,7 @@
 module Interpreter.Exception where
 
-import Prelude
-import Interpreter.Environment
 import Common
+import Interpreter.Environment
 
 data RuntimeError = RuntimeError Pos RuntimeException
 

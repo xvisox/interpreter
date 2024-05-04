@@ -1,7 +1,6 @@
 module Typing.Types where
 
 import AbsSeeemcrd
-import Prelude
 
 data TCArgKind
   = TCArgRef

@@ -1,6 +1,5 @@
 module Typing.Exception where
 
-import Prelude
 import AbsSeeemcrd(Ident)
 
 import Common
