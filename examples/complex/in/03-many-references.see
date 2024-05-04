@@ -1,0 +1,55 @@
+void() getFun(int& x) {
+    int y = 0;
+
+    void f() {
+        x++;
+        y++;
+        printInt(y);
+    }
+    return f;
+}
+
+void moreFun(int &x) {
+    int f(int y) {
+        y++;
+        return y;
+    }
+
+    printInt(f(x));
+}
+
+void funnier(int &x) {
+    void abc(int &y) {
+        y++;
+    }
+
+    void def(int &y) {
+        abc(y);
+        y++;
+    }
+
+    void ghi(int &y) {
+        def(y);
+        y++;
+    }
+
+    ghi(x);
+}
+
+void main() {
+    int x = 2115;
+
+    void() eee = getFun(x);
+    eee(); eee();
+    printStr("x: " + toStr(x) + "\n");
+
+    eee = getFun(x);
+    eee(); eee();
+    printStr("x: " + toStr(x) + "\n");
+
+    moreFun(x);
+    printStr("x: " + toStr(x) + "\n");
+
+    funnier(x);
+    printStr("x: " + toStr(x));
+}

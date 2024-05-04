@@ -6,7 +6,7 @@ TARGETS = $(wildcard $(SRC)/**/*.hs)
 .PHONY: all clean
 
 all: $(TARGETS)
-	$(GHC) --make $(SRC)/Main.hs -isrc -o interpreter -Wall
+	$(GHC) --make $(SRC)/Main.hs -isrc -o interpreter
 
 clean:
 	rm -f interpreter

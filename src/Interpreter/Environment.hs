@@ -1,8 +1,9 @@
 module Interpreter.Environment where
 
+import AbsSeeemcrd
+
 import Data.Map
 import Data.Maybe(fromJust)
-import AbsSeeemcrd
 
 data IArgKind = IArgRef | IArgVal
   deriving (Show)
@@ -14,6 +15,13 @@ data IVal = IInt Int
           | IString String
           | IFunc [IArg] Block Env
           | IVoid
+
+mapArgsToIFunc :: [Arg] -> Block -> Env -> IVal
+mapArgsToIFunc args block env = IFunc (zip argsKinds argsIdents) block env where
+  argsIdents = Prelude.map (\(AArg _ _ argIdent) -> argIdent) args
+  argsKinds = Prelude.map (\(AArg _ argKind _) -> case argKind of
+    ValArg _ _ -> IArgVal
+    RefArg _ _ -> IArgRef) args
 
 instance Show IVal where
   show (IInt i) = show i

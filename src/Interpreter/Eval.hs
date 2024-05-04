@@ -55,13 +55,7 @@ evalTopDefs (topDef:topDefs) = do
 
 evalTopDef :: TopDef -> IM Env
 evalTopDef (GlobalDef _ varType items) = evalItems varType items
-evalTopDef (FnDef _ _ ident args block) = do
-  let argsIdents = map (\(AArg _ _ argIdent) -> argIdent) args
-  let argsKinds = map (\(AArg _ argKind _) -> case argKind of
-        ValArg _ _ -> IArgVal
-        RefArg _ _ -> IArgRef) args
-  env <- ask
-  declareIdent ident $ IFunc (zip argsKinds argsIdents) block env
+evalTopDef (FnDef _ _ ident args block) = ask >>= \env -> declareIdent ident $ mapArgsToIFunc args block env
 
 evalItems :: Type -> [Item] -> IM Env
 evalItems _ [] = ask
@@ -79,14 +73,9 @@ evalExpr (ELitInt _ int) = return $ IInt (fromIntegral int)
 evalExpr (ELitTrue _) = return $ IBool True
 evalExpr (ELitFalse _) = return $ IBool False
 evalExpr (EString _ string) = return $ IString string
-
-evalExpr (Neg _ expr) = do
-  IInt int <- evalExpr expr
-  return $ IInt (negate int)
-
-evalExpr (Not _ expr) = do
-  IBool bool <- evalExpr expr
-  return $ IBool (not bool)
+evalExpr (Neg _ expr) = evalExpr expr >>= \(IInt int) -> return $ IInt (-int)
+evalExpr (Not _ expr) = evalExpr expr >>= \(IBool bool) -> return $ IBool (not bool)
+evalExpr (ELambda _ _ args block) = ask >>= \env -> return $ mapArgsToIFunc args block env
 
 evalExpr (EMul pos expr1 op expr2) = do
   IInt int1 <- evalExpr expr1
@@ -130,17 +119,9 @@ evalExpr (EOr _ expr1 expr2) = do
   IBool bool2 <- evalExpr expr2
   return $ IBool (bool1 || bool2)
 
-evalExpr (ELambda _ _ args block) = do
-  let argsIdents = map (\(AArg _ _ argIdent) -> argIdent) args
-  let argsKinds = map (\(AArg _ argKind _) -> case argKind of
-        ValArg _ _ -> IArgVal
-        RefArg _ _ -> IArgRef) args
-  env <- ask
-  return $ IFunc (zip argsKinds argsIdents) block env
-
 evalExpr (EApp pos ident exprs) = do
   if isBuiltInFunction ident
-    then evalBuiltInFunction ident =<< mapM evalExpr exprs
+    then evalBuiltInFunction pos ident =<< mapM evalExpr exprs
     else do
       callEnv <- ask
       callStore <- get
@@ -180,6 +161,7 @@ evalStmts (stmt:stmts) = do
   local (const env) $ evalStmts stmts
 
 evalStmt :: Stmt -> IM Env
+evalStmt (SExp _ expr) = evalExpr expr >> ask
 evalStmt (BStmt _ block) = evalBlock block >> ask
 evalStmt (DStmt _ topDef) = evalTopDef topDef
 evalStmt (Ass _ ident expr) = do
@@ -215,38 +197,33 @@ evalStmt (Decr pos ident) = do
       return env
     _ -> throwRuntimeError pos UnexpectedError
 
-evalStmt (Ret pos expr) = do
-  value <- evalExpr expr
-  throwRuntimeError pos (ReturnFlag value)
-
+evalStmt (Ret pos expr) = evalExpr expr >>= \value -> throwRuntimeError pos (ReturnFlag value)
 evalStmt (VRet pos) = throwRuntimeError pos (ReturnFlag IVoid)
 
 evalStmt (Cond _ expr block) = do
-  IBool bool <- evalExpr expr
-  if bool
+  IBool result <- evalExpr expr
+  if result
     then evalBlock block >> ask
     else ask
 
 evalStmt (CondElse _ expr ifBlock elseBlock) = do
-  IBool bool <- evalExpr expr
-  if bool
+  IBool result <- evalExpr expr
+  if result
     then evalBlock ifBlock >> ask
     else evalBlock elseBlock >> ask
 
 evalStmt (While _ expr block) = do
-  IBool bool <- evalExpr expr
-  if bool
+  IBool result <- evalExpr expr
+  if result
     then evalBlock block >> evalStmt (While Nothing expr block)
     else ask
 
-evalStmt (SExp _ expr) = evalExpr expr >> ask
-
-evalBuiltInFunction :: Ident -> [IVal] -> IM IVal
-evalBuiltInFunction (Ident "printStr") [IString string] = liftIO $ putStrLn string >> return IVoid
-evalBuiltInFunction (Ident "printInt") [IInt int] = liftIO $ print int >> return IVoid
-evalBuiltInFunction (Ident "printBool") [IBool bool] = liftIO $ print bool >> return IVoid
-evalBuiltInFunction (Ident "toStr") [IInt int] = return $ IString (show int)
-evalBuiltInFunction (Ident "toInt") [IString string] = case reads string of
+evalBuiltInFunction :: Pos -> Ident -> [IVal] -> IM IVal
+evalBuiltInFunction _ (Ident "printStr") [IString string] = liftIO $ putStrLn string >> return IVoid
+evalBuiltInFunction _ (Ident "printInt") [IInt int] = liftIO $ print int >> return IVoid
+evalBuiltInFunction _ (Ident "printBool") [IBool bool] = liftIO $ print bool >> return IVoid
+evalBuiltInFunction _ (Ident "toStr") [IInt int] = return $ IString (show int)
+evalBuiltInFunction pos (Ident "toInt") [IString string] = case reads string of
   [(int, "")] -> return $ IInt int
-  _ -> throwRuntimeError Nothing UnexpectedError
-evalBuiltInFunction _ _ = throwRuntimeError Nothing UnexpectedError
+  _ -> throwRuntimeError pos $ IntegerParseError string
+evalBuiltInFunction pos _ _ = throwRuntimeError pos UnexpectedError

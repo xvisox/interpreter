@@ -1,0 +1,1 @@
+Type error: Argument mismatch: expected (&int) -> void, got (int) -> void at line 12, column 5

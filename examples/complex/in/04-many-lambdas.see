@@ -1,0 +1,22 @@
+string pipeline(int x, int(int) f, string(int) g) {
+    return g(f(x));
+}
+
+void main() {
+    int(int) f = int lambda(int x) => { return x * 2; };
+
+    printStr(pipeline(5, f, string lambda(int x) => {
+        int y = 21;
+        return toStr(x * 3 + y);
+    }));
+
+    int(string(bool())) h = int lambda(string(bool()) g) => {
+        return toInt(g(bool lambda() => { return true; }));
+    };
+
+    int result = h(string lambda(bool() b) => {
+        printBool(b());
+        return "21";
+    });
+    printInt(result);
+}

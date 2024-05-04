@@ -1,4 +1,5 @@
 void main() {
+    int t = 5;
     while (t--) { // valid c++ code...
         printInt(t);
     }
