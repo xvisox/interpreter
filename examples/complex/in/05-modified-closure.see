@@ -1,0 +1,18 @@
+void() f(int &x) {
+    int t = 5, y = 9;
+    while (true) {
+        y--;
+        t--;
+        if (t == 3) {
+            return void lambda() => { x = y; };
+        }
+    }
+
+    return void lambda() => { toInt("nan"); };
+}
+
+void main() {
+    int x = 0;
+    void() l = f(x); l();
+    printInt(x);
+}
