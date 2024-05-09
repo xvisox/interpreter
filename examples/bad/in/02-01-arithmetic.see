@@ -1,6 +1,7 @@
 void main() {
-    printInt(1 / 0);
-    printInt(21++15);
+    int x = 1;
+    int y = 1 + 9;
+    printInt(2115 / (x + y * 2 - 21));
 
     return;
 }
