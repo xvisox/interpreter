@@ -1,6 +1,5 @@
 GHC = ghc
 SRC = src
-DIRS = $(shell find $(SRC) -type d)
 TARGETS = $(wildcard $(SRC)/**/*.hs)
 
 .PHONY: all clean
