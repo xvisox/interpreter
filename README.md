@@ -46,6 +46,17 @@ bardziej zaawansowane przykłady programów. Oba foldery głównie służyły do
 type-checkera oraz interpretera, dlatego są osobno. Dodałem także skrypt pomocniczy, który porównuje wyniki działania
 interpretera z oczekiwanymi wynikami (w celu testowania regresyjnego).
 
+### Uruchomienie rozwiązania
+
+```bash
+make                 # buduje interpreter
+./interpreter <plik> # uruchamia interpreter na pliku
+./interpreter        # uruchamia interpreter na standardowym wejściu
+```
+
+Można także uruchomić skrypt `run_tests.sh`, który buduje rozwiązanie i sprawdza wszystkie programy w
+folderze `examples`.
+
 ### Tabelka cech
 
 ```txt
