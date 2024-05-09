@@ -49,6 +49,14 @@ int fun(int &x) {
     return 0;
 }
 
+int() counter() {
+    int i = 0;
+    return int lambda() => {
+        i++;
+        return i;
+    };
+}
+
 void main() {
     printInt(abc());
     def();
@@ -58,4 +66,7 @@ void main() {
 
     x = 42; y = fun(x);
     printStr(toStr(x) + " " + toStr(y));
+
+    int() c = counter();
+    printInt(c() + c() + c());
 }

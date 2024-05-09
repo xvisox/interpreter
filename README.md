@@ -37,6 +37,15 @@ funkcji.
 Język będzie posiadał kilka funkcji standardowych m.in. `printStr, printInt, printBool` oraz funkcje
 pomocnicze takie jak `toStr(int), toInt(str)`.
 
+### Przykłady
+
+Wszystkie dostępne konstrukcje języka można znaleźć w folderze `examples`. Jest tam kilka folderów z przykładami
+min. `good` oraz `bad` gdzie można znaleźć poprawne oraz niepoprawne programy. Dodatkowo stworzyłem folder `typing`
+gdzie znajdują się przykłady związane z weryfikacją typów. Dostępny jest także folder `complex` gdzie znajdują się
+bardziej zaawansowane przykłady programów. Oba foldery głównie służyły do testowania konkretnych funkcjonalności
+type-checkera oraz interpretera, dlatego są osobno. Dodałem także skrypt pomocniczy, który porównuje wyniki działania
+interpretera z oczekiwanymi wynikami (w celu testowania regresyjnego).
+
 ### Tabelka cech
 
 ```txt
@@ -61,4 +70,5 @@ pomocnicze takie jak `toStr(int), toInt(str)`.
   
   Razem: 30
 ```
+
 Autor: Hubert Michalski

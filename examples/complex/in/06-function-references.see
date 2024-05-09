@@ -1,0 +1,35 @@
+string() placeholder1 = string lambda() => { return ""; };
+void(string()) placeholder2 = void lambda(string() fun) => {};
+
+void make(void(string()) &fun1, string() &fun2) {
+  string() privateFun = placeholder1;
+
+  void setter(string() fun) {
+    privateFun = fun;
+  }
+  fun1 = setter;
+
+  string getter() {
+    return privateFun();
+  }
+  fun2 = getter;
+}
+
+void main() {
+    string() getter1 = placeholder1, getter2 = placeholder1;
+    void(string()) setter1 = placeholder2, setter2 = placeholder2;
+
+    make(setter1, getter1);
+    setter1(string lambda() => { return "Hello, World!"; });
+    printStr(getter1());
+    setter1(string lambda() => { return "Hello, Universe!"; });
+    printStr(getter1());
+
+    make(setter2, getter2);
+    setter2(string lambda() => { return "Hello, Mom!"; });
+    printStr(getter2());
+    setter2(string lambda() => { return "Hello, Dad!"; });
+    printStr(getter2());
+
+    printStr(getter1()); // not affected by getter2
+}

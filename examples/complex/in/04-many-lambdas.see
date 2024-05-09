@@ -2,6 +2,10 @@ string pipeline(int x, int(int) f, string(int) g) {
     return g(f(x));
 }
 
+int(int) compose(int(int) f, int(int) g) {
+    return int lambda(int x) => { return f(g(x)); };
+}
+
 void main() {
     int(int) f = int lambda(int x) => { return x * 2; };
 
@@ -19,4 +23,9 @@ void main() {
         return "21";
     });
     printInt(result);
+
+    int(int) g = int lambda(int x) => { return x + 1; };
+    int(int) h1 = compose(f, g), h2 = compose(g, f);
+    printInt(h1(5));
+    printInt(h2(5));
 }
