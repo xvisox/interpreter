@@ -19,7 +19,7 @@ data TypeCheckException
   | ArgumentMismatch TCArgType TCArgType
   | NoReturn Ident
   | FunctionVarNotInitialized Ident
-  | VoidInvalidType Ident
+  | InvalidTypeVoid Ident
   | BuiltInFunctionOverride Ident
   | InvalidOperation TCType TCType
   | MainFunctionMissing
@@ -33,7 +33,7 @@ instance Show TypeCheckException where
   show (ArgumentMismatch expected actual) = "Argument mismatch: expected " ++ show expected ++ ", got " ++ show actual
   show (NoReturn ident) = "No return statement in function: " ++ show ident
   show (FunctionVarNotInitialized ident) = "Function variable has to be initialized: " ++ show ident
-  show (VoidInvalidType ident) = "Void type is not allowed for variable: " ++ show ident
+  show (InvalidTypeVoid ident) = "Void type is not allowed for variable: " ++ show ident
   show (BuiltInFunctionOverride ident) = "Cannot override built-in function: " ++ show ident
   show (InvalidOperation type1 type2) = "Invalid operation between types: " ++ show type1 ++ " and " ++ show type2
   show MainFunctionMissing = "Main function missing"

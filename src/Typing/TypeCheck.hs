@@ -21,7 +21,7 @@ throwTypeCheckError pos err = throwError $ TypeCheckError pos err
 
 declareIdentOrThrow :: Pos -> Ident -> TCType -> TCM Env
 declareIdentOrThrow pos ident varType
-  | varType == TCVoid = throwTypeCheckError pos $ VoidInvalidType ident
+  | varType == TCVoid = throwTypeCheckError pos $ InvalidTypeVoid ident
   | isBuiltInFunction ident = throwTypeCheckError pos $ BuiltInFunctionOverride ident
   | otherwise = do
       env <- ask
