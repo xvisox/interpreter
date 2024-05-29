@@ -1,0 +1,9 @@
+void main() {
+    printBool(true == false);
+    printBool(true != false);
+    printBool("hello" == "hello");
+    printBool("hello" != "hello");
+    string s = "hello";
+    printBool(s == "hello");
+    printBool(s != "hello");
+}

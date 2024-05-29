@@ -20,13 +20,16 @@ throwTypeCheckError pos err = throwError $ TypeCheckError pos err
 -- Utility functions
 
 declareIdentOrThrow :: Pos -> Ident -> TCType -> TCM Env
-declareIdentOrThrow pos ident varType = do
-  env <- ask
-  case lookupVar ident env of
-    Just (_, varScope) -> if varScope == (scope env)
-                            then throwTypeCheckError pos $ Redeclared ident
-                            else return $ insertVar ident varType env
-    Nothing -> return $ insertVar ident varType env
+declareIdentOrThrow pos ident varType
+  | varType == TCVoid = throwTypeCheckError pos $ VoidInvalidType ident
+  | isBuiltInFunction ident = throwTypeCheckError pos $ BuiltInFunctionOverride ident
+  | otherwise = do
+      env <- ask
+      case lookupVar ident env of
+        Just (_, varScope) -> if varScope == (scope env)
+                                then throwTypeCheckError pos $ Redeclared ident
+                                else return $ insertVar ident varType env
+        Nothing -> return $ insertVar ident varType env
 
 validateIdentOrThrow :: Pos -> Ident -> TCType -> TCM Env
 validateIdentOrThrow pos ident expectedType = do
@@ -67,10 +70,11 @@ typeCheckTopDef (GlobalDef _ varType items) = typeCheckItems (mapToTCType varTyp
 typeCheckTopDef (FnDef pos returnType ident args block) = do
   let returnType' = mapToTCType returnType
   let argsTypes' = mapToTCArgTypes args
-  env <- declareIdentOrThrow pos ident (TCFun argsTypes' returnType')
+  let typesWithIdents' = mapToTypesWithIdents args
+  when (ident `elem` (map snd typesWithIdents')) $ throwTypeCheckError pos $ Redeclared ident
 
-  let argsWithTypes' = mapToTypesWithIdents args
-  env' <- foldM (\acc (type', ident') -> local (const acc) (declareIdentOrThrow pos ident' type')) (newScope env) argsWithTypes'
+  env <- declareIdentOrThrow pos ident (TCFun argsTypes' returnType')
+  env' <- foldM (\acc (type', ident') -> local (const acc) (declareIdentOrThrow pos ident' type')) (newScope env) typesWithIdents'
   env'' <- local (const env' { hasReturn = False, returnType = returnType', scope = scope env }) $ typeCheckBlock block
 
   unless (hasReturn env'' || returnType' == TCVoid) $ throwTypeCheckError pos $ NoReturn ident
@@ -83,7 +87,7 @@ typeCheckItems varType (item:items) = do
   local (const env) $ typeCheckItems varType items
 
 typeCheckItem :: TCType -> Item -> TCM Env
-typeCheckItem (TCFun _ _) (NoInit pos ident) = throwTypeCheckError pos $ FunctionNotDefined ident
+typeCheckItem (TCFun _ _) (NoInit pos ident) = throwTypeCheckError pos $ FunctionVarNotInitialized ident
 typeCheckItem varType (NoInit pos ident) = declareIdentOrThrow pos ident varType
 typeCheckItem varType (Init pos ident expr) = do
   exprType <- typeCheckExpr expr
@@ -112,9 +116,18 @@ typeCheckExpr (EAdd pos expr1 op expr2) = do
   case (exprType1, exprType2, op) of
     (TCInt, TCInt, _) -> return TCInt
     (TCString, TCString, Plus _) -> return TCString
-    _ -> throwTypeCheckError pos $ TypeMismatch exprType1 exprType2
+    _ -> throwTypeCheckError pos $ InvalidOperation exprType1 exprType2
 
-typeCheckExpr (ERel pos expr1 _ expr2) = ensureType pos TCInt expr1 >> ensureType pos TCInt expr2 >> return TCBool
+typeCheckExpr (ERel pos expr1 op expr2) = do
+  exprType1 <- typeCheckExpr expr1
+  exprType2 <- typeCheckExpr expr2
+  case (exprType1, exprType2, op) of
+    (TCInt, TCInt, _) -> return TCBool
+    (TCString, TCString, EQU _) -> return TCBool
+    (TCString, TCString, NE _) -> return TCBool
+    (TCBool, TCBool, EQU _) -> return TCBool
+    (TCBool, TCBool, NE _) -> return TCBool
+    _ -> throwTypeCheckError pos $ InvalidOperation exprType1 exprType2
 
 typeCheckExpr (EAnd pos expr1 expr2) = ensureType pos TCBool expr1 >> ensureType pos TCBool expr2 >> return TCBool
 
@@ -123,10 +136,10 @@ typeCheckExpr (EOr pos expr1 expr2) = ensureType pos TCBool expr1 >> ensureType 
 typeCheckExpr (ELambda pos returnType args block) = do
   let returnType' = mapToTCType returnType
   let argsTypes' = mapToTCArgTypes args
-  env <- ask
+  let typesWithIdents' = mapToTypesWithIdents args
 
-  let argsWithTypes' = mapToTypesWithIdents args
-  env' <- foldM (\acc (type', ident') -> local (const acc) (declareIdentOrThrow pos ident' type')) (newScope env) argsWithTypes'
+  env <- ask
+  env' <- foldM (\acc (type', ident') -> local (const acc) (declareIdentOrThrow pos ident' type')) (newScope env) typesWithIdents'
   env'' <- local (const env' { hasReturn = False, returnType = returnType', scope = scope env }) $ typeCheckBlock block
 
   unless (hasReturn env'' || returnType' == TCVoid) $ throwTypeCheckError pos $ NoReturn (Ident "lambda")

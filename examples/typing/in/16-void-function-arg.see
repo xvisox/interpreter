@@ -1,0 +1,5 @@
+// void fun(void y) {}
+
+void main() {
+    int(void) x = int lambda(void y) => { return 0; };
+}

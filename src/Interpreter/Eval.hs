@@ -99,15 +99,12 @@ evalExpr (EAdd pos expr1 op expr2) = do
     _ -> throwRuntimeError pos UnexpectedError
 
 evalExpr (ERel _ expr1 op expr2) = do
-  IInt int1 <- evalExpr expr1
-  IInt int2 <- evalExpr expr2
-  case op of
-    LTH _ -> return $ IBool (int1 < int2)
-    LE _ -> return $ IBool (int1 <= int2)
-    GTH _ -> return $ IBool (int1 > int2)
-    GE _ -> return $ IBool (int1 >= int2)
-    EQU _ -> return $ IBool (int1 == int2)
-    NE _ -> return $ IBool (int1 /= int2)
+  val1 <- evalExpr expr1
+  val2 <- evalExpr expr2
+  case (val1, val2) of
+    (IInt int1, IInt int2) -> evalIntRel int1 int2 op
+    (IString str1, IString str2) -> evalStrRel str1 str2 op
+    (IBool bool1, IBool bool2) -> evalBoolRel bool1 bool2 op
 
 evalExpr (EAnd _ expr1 expr2) = do
   IBool bool1 <- evalExpr expr1
@@ -148,6 +145,25 @@ evalExpr (EApp pos ident exprs) = do
       local (const env) $ (evalBlock block >> return IVoid) `catchError` (\err -> case err of
         RuntimeError _ (ReturnFlag value) -> return value
         _ -> throwError err)
+
+evalIntRel :: Int -> Int -> RelOp -> IM IVal
+evalIntRel int1 int2 op = case op of
+  LTH _ -> return $ IBool (int1 < int2)
+  LE _ -> return $ IBool (int1 <= int2)
+  GTH _ -> return $ IBool (int1 > int2)
+  GE _ -> return $ IBool (int1 >= int2)
+  EQU _ -> return $ IBool (int1 == int2)
+  NE _ -> return $ IBool (int1 /= int2)
+
+evalStrRel :: String -> String -> RelOp -> IM IVal
+evalStrRel str1 str2 op = case op of
+  EQU _ -> return $ IBool (str1 == str2)
+  NE _ -> return $ IBool (str1 /= str2)
+
+evalBoolRel :: Bool -> Bool -> RelOp -> IM IVal
+evalBoolRel bool1 bool2 op = case op of
+  EQU _ -> return $ IBool (bool1 == bool2)
+  NE _ -> return $ IBool (bool1 /= bool2)
 
 evalBlock :: Block -> IM Env
 evalBlock (BBlock _ stmts) = do

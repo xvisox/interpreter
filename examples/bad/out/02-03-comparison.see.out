@@ -1,1 +1,1 @@
-Type error: Type mismatch: expected int, got bool at line 4, column 9
+Type error: Invalid operation between types: int and bool at line 4, column 9

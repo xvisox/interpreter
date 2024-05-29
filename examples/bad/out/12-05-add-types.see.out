@@ -1,1 +1,1 @@
-Type error: Type mismatch: expected int, got string at line 2, column 13
+Type error: Invalid operation between types: int and string at line 2, column 13
