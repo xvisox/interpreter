@@ -46,6 +46,18 @@ bardziej zaawansowane przykłady programów. Oba foldery głównie służyły do
 type-checkera oraz interpretera, dlatego są osobno. Dodałem także skrypt pomocniczy, który porównuje wyniki działania
 interpretera z oczekiwanymi wynikami (w celu testowania regresyjnego).
 
+### Wprowadzone poprawki
+
+- [x] Dodano operatory `==` i `!=` dla typów `bool` oraz `string`. Przykład można znaleźć
+  w `complex/07-bool-str-equals.see`. Jest to jedyna poprawka w interpreterze, która nie jest związana z type-checkerem.
+- [x] Nie można teraz zadeklarować zmiennych/parametrów typu `void`.
+  Przykłady: `typing/15-void-variable.see`, `typing/16-void-function-arg.see`.
+- [x] Nie można zadeklarować argumentu funkcji z taką samą nazwą jak funkcja.
+  Przykład: `typing/19-function-same-arg-ident.see`.
+- [x] Poprawiono komunikat o błędzie w przypadku, gdy funkcja nie jest zainicjalizowana.
+  Przykład: `typing/11-function-undefined.see`.
+- [x] Zabroniono nadpisywanie funkcji wbudowanych do języka. Przykład: `typing/18-builtin-override.see`.
+
 ### Uruchomienie rozwiązania
 
 ```bash
